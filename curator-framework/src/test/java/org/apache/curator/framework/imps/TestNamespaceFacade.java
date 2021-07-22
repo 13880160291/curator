@@ -18,11 +18,6 @@
  */
 package org.apache.curator.framework.imps;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,11 +25,13 @@ import org.apache.curator.test.BaseClassForTests;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.retry.RetryOneTime;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.KeeperException.NoAuthException;
 import org.apache.zookeeper.data.ACL;
-import org.junit.jupiter.api.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class TestNamespaceFacade extends BaseClassForTests
 {
@@ -44,7 +41,7 @@ public class TestNamespaceFacade extends BaseClassForTests
         try
         {
             CuratorFrameworkFactory.builder().namespace("/snafu").retryPolicy(new RetryOneTime(1)).connectString("foo").build();
-            fail();
+            Assert.fail();
         }
         catch ( IllegalArgumentException e )
         {
@@ -64,10 +61,10 @@ public class TestNamespaceFacade extends BaseClassForTests
             CuratorFramework fooClient = client.usingNamespace("foo");
             CuratorFramework barClient = client.usingNamespace("bar");
 
-            assertEquals(client.getNamespace(), "");
-            assertEquals(client2.getNamespace(), "snafu");
-            assertEquals(fooClient.getNamespace(), "foo");
-            assertEquals(barClient.getNamespace(), "bar");
+            Assert.assertEquals(client.getNamespace(), "");
+            Assert.assertEquals(client2.getNamespace(), "snafu");
+            Assert.assertEquals(fooClient.getNamespace(), "foo");
+            Assert.assertEquals(barClient.getNamespace(), "bar");
         }
         finally
         {
@@ -90,8 +87,8 @@ public class TestNamespaceFacade extends BaseClassForTests
             fooClient.create().forPath("/one");
             barClient.create().forPath("/one");
 
-            assertNotNull(client.getZookeeperClient().getZooKeeper().exists("/foo/one", false));
-            assertNotNull(client.getZookeeperClient().getZooKeeper().exists("/bar/one", false));
+            Assert.assertNotNull(client.getZookeeperClient().getZooKeeper().exists("/foo/one", false));
+            Assert.assertNotNull(client.getZookeeperClient().getZooKeeper().exists("/bar/one", false));
         }
         finally
         {
@@ -107,8 +104,8 @@ public class TestNamespaceFacade extends BaseClassForTests
         {
             client.start();
 
-            assertSame(client.usingNamespace("foo"), client.usingNamespace("foo"));
-            assertNotSame(client.usingNamespace("foo"), client.usingNamespace("bar"));
+            Assert.assertSame(client.usingNamespace("foo"), client.usingNamespace("foo"));
+            Assert.assertNotSame(client.usingNamespace("foo"), client.usingNamespace("bar"));
         }
         finally
         {
@@ -125,14 +122,14 @@ public class TestNamespaceFacade extends BaseClassForTests
             client.start();
 
             client.create().forPath("/one");
-            assertNotNull(client.getZookeeperClient().getZooKeeper().exists("/one", false));
+            Assert.assertNotNull(client.getZookeeperClient().getZooKeeper().exists("/one", false));
 
             client.usingNamespace("space").create().forPath("/one");
-            assertNotNull(client.getZookeeperClient().getZooKeeper().exists("/space", false));
+            Assert.assertNotNull(client.getZookeeperClient().getZooKeeper().exists("/space", false));
 
             client.usingNamespace("name").create().forPath("/one");
-            assertNotNull(client.getZookeeperClient().getZooKeeper().exists("/name", false));
-            assertNotNull(client.getZookeeperClient().getZooKeeper().exists("/name/one", false));
+            Assert.assertNotNull(client.getZookeeperClient().getZooKeeper().exists("/name", false));
+            Assert.assertNotNull(client.getZookeeperClient().getZooKeeper().exists("/name/one", false));
         }
         finally
         {
@@ -152,23 +149,23 @@ public class TestNamespaceFacade extends BaseClassForTests
             client.start();
 
             client.create().forPath("/one");
-            assertNotNull(client.getZookeeperClient().getZooKeeper().exists("/one", false));
+            Assert.assertNotNull(client.getZookeeperClient().getZooKeeper().exists("/one", false));
 
-            assertNotNull(client.checkExists().forPath("/"));
+            Assert.assertNotNull(client.checkExists().forPath("/"));
             try
             {
                 client.checkExists().forPath("");
-                fail("IllegalArgumentException expected");
+                Assert.fail("IllegalArgumentException expected");
             }
             catch ( IllegalArgumentException expected )
             {
             }
 
-            assertNotNull(client.usingNamespace("one").checkExists().forPath("/"));
+            Assert.assertNotNull(client.usingNamespace("one").checkExists().forPath("/"));
             try
             {
                 client.usingNamespace("one").checkExists().forPath("");
-                fail("IllegalArgumentException expected");
+                Assert.fail("IllegalArgumentException expected");
             }
             catch ( IllegalArgumentException expected )
             {
@@ -188,10 +185,10 @@ public class TestNamespaceFacade extends BaseClassForTests
         client.start();
         CuratorFramework    namespaced = client.usingNamespace(null);
 
-        assertEquals(client.getState(), namespaced.getState(), "Namespaced state did not match true state after call to start.");
+        Assert.assertEquals(client.getState(), namespaced.getState(), "Namespaced state did not match true state after call to start.");
 
         client.close();
-        assertEquals(client.getState(), namespaced.getState(), "Namespaced state did not match true state after call to close.");
+        Assert.assertEquals(client.getState(), namespaced.getState(), "Namespaced state did not match true state after call to close.");
     }
     
     /**
@@ -208,7 +205,7 @@ public class TestNamespaceFacade extends BaseClassForTests
         client.create().creatingParentsIfNeeded().forPath("/parent/child", "A string".getBytes());
         CuratorFramework client2 = client.usingNamespace("parent");
 
-        assertNotNull(client2.getData().forPath("/child"));  
+        Assert.assertNotNull(client2.getData().forPath("/child"));  
         client.setACL().withACL(Collections.singletonList(
             new ACL(ZooDefs.Perms.WRITE, ZooDefs.Ids.ANYONE_ID_UNSAFE))).
                 forPath("/parent/child");
@@ -218,14 +215,14 @@ public class TestNamespaceFacade extends BaseClassForTests
         try
         {
             List<ACL> acls = client2.getACL().forPath("/child");
-            assertNotNull(acls);
-            assertEquals(acls.size(), 1);
-            assertEquals(acls.get(0).getId(), ZooDefs.Ids.ANYONE_ID_UNSAFE);
-            assertEquals(acls.get(0).getPerms(), ZooDefs.Perms.WRITE);
+            Assert.assertNotNull(acls);
+            Assert.assertEquals(acls.size(), 1);
+            Assert.assertEquals(acls.get(0).getId(), ZooDefs.Ids.ANYONE_ID_UNSAFE);
+            Assert.assertEquals(acls.get(0).getPerms(), ZooDefs.Perms.WRITE);
             client2.setACL().withACL(Collections.singletonList(
                 new ACL(ZooDefs.Perms.DELETE, ZooDefs.Ids.ANYONE_ID_UNSAFE))).
                     forPath("/child");
-            fail("Expected auth exception was not thrown");
+            Assert.fail("Expected auth exception was not thrown");
         }
         catch(NoAuthException e)
         {
@@ -238,7 +235,7 @@ public class TestNamespaceFacade extends BaseClassForTests
         CuratorFramework client = CuratorFrameworkFactory.builder().namespace("").retryPolicy(new RetryOneTime(1)).connectString("foo").build();
         CuratorFrameworkImpl clientImpl = (CuratorFrameworkImpl) client;
 
-        assertEquals(clientImpl.unfixForNamespace("/foo/bar"), "/foo/bar");
+        Assert.assertEquals(clientImpl.unfixForNamespace("/foo/bar"), "/foo/bar");
 
         CloseableUtils.closeQuietly(client);
     }

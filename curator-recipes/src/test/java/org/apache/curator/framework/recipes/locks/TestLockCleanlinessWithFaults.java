@@ -18,17 +18,15 @@
  */
 package org.apache.curator.framework.recipes.locks;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.imps.TestCleanState;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.curator.test.BaseClassForTests;
+import org.apache.curator.utils.CloseableUtils;
 import org.apache.zookeeper.KeeperException;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.List;
 
 public class TestLockCleanlinessWithFaults extends BaseClassForTests
@@ -45,7 +43,7 @@ public class TestLockCleanlinessWithFaults extends BaseClassForTests
             client.start();
 
             client.create().creatingParentsIfNeeded().forPath(PATH);
-            assertEquals(client.checkExists().forPath(PATH).getNumChildren(), 0);
+            Assert.assertEquals(client.checkExists().forPath(PATH).getNumChildren(), 0);
 
             LockInternals       internals = new LockInternals(client, new StandardLockInternalsDriver(), PATH, "lock-", 1)
             {
@@ -58,7 +56,7 @@ public class TestLockCleanlinessWithFaults extends BaseClassForTests
             try
             {
                 internals.attemptLock(0, null, null);
-                fail();
+                Assert.fail();
             }
             catch ( KeeperException.NoNodeException dummy )
             {
@@ -66,7 +64,7 @@ public class TestLockCleanlinessWithFaults extends BaseClassForTests
             }
 
             // make sure no nodes are left lying around
-            assertEquals(client.checkExists().forPath(PATH).getNumChildren(), 0);
+            Assert.assertEquals(client.checkExists().forPath(PATH).getNumChildren(), 0);
         }
         finally
         {

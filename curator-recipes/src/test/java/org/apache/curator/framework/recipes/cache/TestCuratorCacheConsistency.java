@@ -19,10 +19,6 @@
 
 package org.apache.curator.framework.recipes.cache;
 
-import static org.apache.curator.framework.recipes.cache.CuratorCache.Options.DO_NOT_CLEAR_ON_CLOSE;
-import static org.apache.curator.framework.recipes.cache.CuratorCacheListener.builder;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
@@ -30,10 +26,10 @@ import org.apache.curator.test.InstanceSpec;
 import org.apache.curator.test.TestingCluster;
 import org.apache.curator.test.compatibility.CuratorTestBase;
 import org.apache.curator.utils.ZKPaths;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.io.Closeable;
 import java.time.Duration;
 import java.time.Instant;
@@ -49,11 +45,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.apache.curator.framework.recipes.cache.CuratorCache.Options.DO_NOT_CLEAR_ON_CLOSE;
+import static org.apache.curator.framework.recipes.cache.CuratorCacheListener.builder;
+
 /**
  * Randomly create nodes in a tree while a set of CuratorCaches listens. Afterwards, validate
  * that the caches contain the same values as ZK itself
  */
-@Tag(CuratorTestBase.zk36Group)
+@Test(groups = CuratorTestBase.zk36Group)
 public class TestCuratorCacheConsistency extends CuratorTestBase
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -167,7 +166,7 @@ public class TestCuratorCacheConsistency extends CuratorTestBase
                 log.error("");
             });
 
-            fail("Errors found");
+            Assert.fail("Errors found");
         }
     }
 
@@ -193,7 +192,7 @@ public class TestCuratorCacheConsistency extends CuratorTestBase
         }
         catch ( Exception e )
         {
-            fail("", e);
+            Assert.fail("", e);
         }
     }
 
@@ -230,7 +229,7 @@ public class TestCuratorCacheConsistency extends CuratorTestBase
             Exception errorSignalException = errorSignal.get();
             if ( errorSignalException != null )
             {
-                fail("A client's error handler was called", errorSignalException);
+                Assert.fail("A client's error handler was called", errorSignalException);
             }
 
             Duration elapsedFromLastServerKill = Duration.between(lastServerKill, Instant.now());
@@ -268,7 +267,7 @@ public class TestCuratorCacheConsistency extends CuratorTestBase
         }
         catch ( Exception e )
         {
-            fail("Could not create/set: " + thisPath);
+            Assert.fail("Could not create/set: " + thisPath);
         }
     }
 
@@ -284,7 +283,7 @@ public class TestCuratorCacheConsistency extends CuratorTestBase
         }
         catch ( Exception e )
         {
-            fail("Could not delete: " + thisPath);
+            Assert.fail("Could not delete: " + thisPath);
         }
     }
 

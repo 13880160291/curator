@@ -18,10 +18,6 @@
  */
 package org.apache.curator.framework.recipes.queue;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.curator.test.BaseClassForTests;
@@ -38,8 +34,9 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.retry.RetryOneTime;
 import org.apache.curator.test.Timing;
 import org.apache.zookeeper.CreateMode;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -110,9 +107,9 @@ public class TestDistributedQueue extends BaseClassForTests
             queue.put(new TestQueueItem("test"));
 
             retryCounter.await(10, TimeUnit.SECONDS);
-            assertEquals(retryCounter.getCount(), 0, "Queue item was not consumed. Retry counter is " + retryCounter.getCount());
-            assertEquals(names.size(), 2);
-            assertEquals(names.get(0).length(), names.get(1).length(), "name1: " + names.get(0) + " - " + "name2: " + names.get(1));
+            Assert.assertEquals(retryCounter.getCount(), 0, "Queue item was not consumed. Retry counter is " + retryCounter.getCount());
+            Assert.assertEquals(names.size(), 2);
+            Assert.assertEquals(names.get(0).length(), names.get(1).length(), "name1: " + names.get(0) + " - " + "name2: " + names.get(1));
         }
         finally
         {
@@ -203,9 +200,9 @@ public class TestDistributedQueue extends BaseClassForTests
                 queue.put(Integer.toString(i));
             }
 
-            assertTrue(timing.awaitLatch(latch));
+            Assert.assertTrue(timing.awaitLatch(latch));
 
-            assertTrue(doubleUsed.size() == 0, doubleUsed.toString());
+            Assert.assertTrue(doubleUsed.size() == 0, doubleUsed.toString());
         }
         finally
         {
@@ -253,17 +250,17 @@ public class TestDistributedQueue extends BaseClassForTests
             int                 iteration = 0;
             while ( consumer.size() < itemQty )
             {
-                assertTrue(++iteration < 10);
+                Assert.assertTrue(++iteration < 10);
                 Thread.sleep(1000);
             }
 
             int                 i = 0;
             for ( TestQueueItem item : consumer.getItems() )
             {
-                assertEquals(item.str, Integer.toString(i++));
+                Assert.assertEquals(item.str, Integer.toString(i++));
             }
             
-            assertEquals(listenerCalls.get(), itemQty);
+            Assert.assertEquals(listenerCalls.get(), itemQty);
         }
         finally
         {
@@ -307,8 +304,8 @@ public class TestDistributedQueue extends BaseClassForTests
                 TestQueueItem       item = new TestQueueItem("1");
                 queue.put(item);
 
-                assertTrue(timing.awaitLatch(latch.get()));
-                assertEquals(count.get(), 2);
+                Assert.assertTrue(timing.awaitLatch(latch.get()));
+                Assert.assertEquals(count.get(), 2);
 
                 queue.setErrorMode(ErrorMode.DELETE);
 
@@ -318,8 +315,8 @@ public class TestDistributedQueue extends BaseClassForTests
                 item = new TestQueueItem("1");
                 queue.put(item);
 
-                assertFalse(latch.get().await(5, TimeUnit.SECONDS)); // consumer should get called only once
-                assertEquals(count.get(), 1);
+                Assert.assertFalse(latch.get().await(5, TimeUnit.SECONDS)); // consumer should get called only once
+                Assert.assertEquals(count.get(), 1);
             }
             finally
             {
@@ -412,7 +409,7 @@ public class TestDistributedQueue extends BaseClassForTests
             }
 
             timing.awaitLatch(latch);
-            assertTrue(duplicateMessages.size() == 0, duplicateMessages.toString());
+            Assert.assertTrue(duplicateMessages.size() == 0, duplicateMessages.toString());
         }
         finally
         {
@@ -533,12 +530,12 @@ public class TestDistributedQueue extends BaseClassForTests
             int                 i = 0;
             for ( TestQueueItem item : takenItems )
             {
-                assertEquals(item.str, Integer.toString(i++));
+                Assert.assertEquals(item.str, Integer.toString(i++));
             }
 
-            assertNotNull(thrownItemFromConsumer1.get());
-            assertTrue((takenItemsForConsumer2.contains(thrownItemFromConsumer1.get())));
-            assertTrue(Sets.intersection(takenItemsForConsumer1, takenItemsForConsumer2).size() == 0);
+            Assert.assertNotNull(thrownItemFromConsumer1.get());
+            Assert.assertTrue((takenItemsForConsumer2.contains(thrownItemFromConsumer1.get())));
+            Assert.assertTrue(Sets.intersection(takenItemsForConsumer1, takenItemsForConsumer2).size() == 0);
         }
         finally
         {
@@ -596,14 +593,14 @@ public class TestDistributedQueue extends BaseClassForTests
                         for ( int i = 0; i < itemQty; ++i )
                         {
                             TestQueueItem item = consumer.take();
-                            assertEquals(item.str, Integer.toString(i));
+                            Assert.assertEquals(item.str, Integer.toString(i));
                         }
                         latch.countDown();
                         return null;
                     }
                 }
             );
-            assertTrue(latch.await(10, TimeUnit.SECONDS));
+            Assert.assertTrue(latch.await(10, TimeUnit.SECONDS));
         }
         finally
         {
@@ -646,8 +643,8 @@ public class TestDistributedQueue extends BaseClassForTests
             for ( int i = 0; i < itemQty; ++i )
             {
                 TestQueueItem   queueItem = consumer.take(1, TimeUnit.SECONDS);
-                assertNotNull(queueItem);
-                assertEquals(queueItem, new TestQueueItem(Integer.toString(i)));
+                Assert.assertNotNull(queueItem);
+                Assert.assertEquals(queueItem, new TestQueueItem(Integer.toString(i)));
             }
         }
         finally
@@ -682,13 +679,13 @@ public class TestDistributedQueue extends BaseClassForTests
             int                 iteration = 0;
             while ( consumer.size() < itemQty )
             {
-                assertTrue(++iteration < 10);
+                Assert.assertTrue(++iteration < 10);
                 Thread.sleep(1000);
             }
 
             List<TestQueueItem> items = consumer.getItems();
 
-            assertEquals(com.google.common.collect.Sets.<TestQueueItem>newHashSet(items).size(), items.size()); // check no duplicates
+            Assert.assertEquals(com.google.common.collect.Sets.<TestQueueItem>newHashSet(items).size(), items.size()); // check no duplicates
         }
         finally
         {
@@ -739,10 +736,10 @@ public class TestDistributedQueue extends BaseClassForTests
             queue.start();
 
             queue.put(new TestQueueItem("1"));
-            assertFalse(queue.flushPuts(timing.forWaiting().seconds(), TimeUnit.SECONDS));
+            Assert.assertFalse(queue.flushPuts(timing.forWaiting().seconds(), TimeUnit.SECONDS));
             latch.countDown();
 
-            assertTrue(queue.flushPuts(timing.forWaiting().seconds(), TimeUnit.SECONDS));
+            Assert.assertTrue(queue.flushPuts(timing.forWaiting().seconds(), TimeUnit.SECONDS));
         }
         finally
         {
@@ -779,14 +776,14 @@ public class TestDistributedQueue extends BaseClassForTests
             int                 iteration = 0;
             while ( consumer.size() < itemQty )
             {
-                assertTrue(++iteration < 10);
+                Assert.assertTrue(++iteration < 10);
                 Thread.sleep(1000);
             }
 
             int                 i = 0;
             for ( TestQueueItem item : consumer.getItems() )
             {
-                assertEquals(item.str, Integer.toString(i++));
+                Assert.assertEquals(item.str, Integer.toString(i++));
             }
         }
         finally

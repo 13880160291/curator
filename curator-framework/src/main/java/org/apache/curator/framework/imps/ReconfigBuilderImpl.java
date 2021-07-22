@@ -130,7 +130,7 @@ public class ReconfigBuilderImpl implements ReconfigBuilder, BackgroundOperation
     @Override
     public StatConfigureEnsembleable withNewMembers(List<String> servers)
     {
-        newMembers = (servers != null && !servers.isEmpty()) ? ImmutableList.copyOf(servers) : null;
+        newMembers = (servers != null) ? ImmutableList.copyOf(servers) : ImmutableList.<String>of();
         return new StatConfigureEnsembleable()
         {
             @Override
@@ -164,7 +164,7 @@ public class ReconfigBuilderImpl implements ReconfigBuilder, BackgroundOperation
     @Override
     public LeaveStatConfigEnsembleable joining(List<String> servers)
     {
-        joining = (servers != null && !servers.isEmpty()) ? ImmutableList.copyOf(servers) : null;
+        joining = (servers != null) ? ImmutableList.copyOf(servers) : ImmutableList.<String>of();
 
         return new LeaveStatConfigEnsembleable()
         {
@@ -211,7 +211,7 @@ public class ReconfigBuilderImpl implements ReconfigBuilder, BackgroundOperation
     @Override
     public JoinStatConfigEnsembleable leaving(List<String> servers)
     {
-        leaving = (servers != null && !servers.isEmpty()) ? ImmutableList.copyOf(servers) : null;
+        leaving = (servers != null) ? ImmutableList.copyOf(servers) : ImmutableList.<String>of();
 
         return new JoinStatConfigEnsembleable()
         {

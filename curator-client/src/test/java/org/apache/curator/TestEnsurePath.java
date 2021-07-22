@@ -18,7 +18,6 @@
  */
 package org.apache.curator;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -37,10 +36,11 @@ import org.apache.curator.retry.RetryOneTime;
 import org.apache.curator.utils.EnsurePath;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class TestEnsurePath
 {
@@ -117,9 +117,9 @@ public class TestEnsurePath
             );
         }
 
-        assertTrue(startedLatch.await(10, TimeUnit.SECONDS));
+        Assert.assertTrue(startedLatch.await(10, TimeUnit.SECONDS));
         semaphore.release(3);
-        assertTrue(finishedLatch.await(10, TimeUnit.SECONDS));
+        Assert.assertTrue(finishedLatch.await(10, TimeUnit.SECONDS));
         verify(client, times(3)).exists(Mockito.<String>any(), anyBoolean());
 
         ensurePath.ensure(curator);

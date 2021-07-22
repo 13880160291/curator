@@ -19,8 +19,6 @@
 
 package org.apache.curator.framework.imps;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.google.common.collect.Queues;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -34,10 +32,10 @@ import org.apache.curator.test.InstanceSpec;
 import org.apache.curator.test.TestingCluster;
 import org.apache.curator.test.Timing;
 import org.apache.curator.utils.CloseableUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -45,13 +43,13 @@ import java.util.concurrent.TimeUnit;
 
 public class TestReadOnly extends BaseClassForTests
 {
-    @BeforeEach
+    @BeforeMethod
     public void setup()
     {
         System.setProperty("readonlymode.enabled", "true");
     }
 
-    @AfterEach
+    @AfterMethod
     public void tearDown()
     {
         System.setProperty("readonlymode.enabled", "false");
@@ -102,7 +100,7 @@ public class TestReadOnly extends BaseClassForTests
             client.checkExists().forPath("/");
 
             ConnectionState state = states.poll(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS);
-            assertEquals(state, ConnectionState.READ_ONLY);
+            Assert.assertEquals(state, ConnectionState.READ_ONLY);
         }
         finally
         {
@@ -153,12 +151,12 @@ public class TestReadOnly extends BaseClassForTests
             }
             cluster.killServer(killInstance);
 
-            assertEquals(reconnectedLatch.getCount(), 1);
-            assertTrue(timing.awaitLatch(readOnlyLatch));
+            Assert.assertEquals(reconnectedLatch.getCount(), 1);
+            Assert.assertTrue(timing.awaitLatch(readOnlyLatch));
 
-            assertEquals(reconnectedLatch.getCount(), 1);
+            Assert.assertEquals(reconnectedLatch.getCount(), 1);
             cluster.restartServer(killInstance);
-            assertTrue(timing.awaitLatch(reconnectedLatch));
+            Assert.assertTrue(timing.awaitLatch(reconnectedLatch));
         }
         finally
         {

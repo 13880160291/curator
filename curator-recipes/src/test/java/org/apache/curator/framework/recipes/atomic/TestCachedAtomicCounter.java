@@ -18,16 +18,12 @@
  */
 package org.apache.curator.framework.recipes.atomic;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryOneTime;
 import org.apache.curator.test.BaseClassForTests;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class TestCachedAtomicCounter extends BaseClassForTests
@@ -96,9 +92,9 @@ public class TestCachedAtomicCounter extends BaseClassForTests
             for ( int i = 0; i < FACTOR; ++i )
             {
                 value = cachedLong.next();
-                assertTrue(value.succeeded());
-                assertEquals(value.preValue().longValue(), i);
-                assertEquals(value.postValue().longValue(), i + 1);
+                Assert.assertTrue(value.succeeded());
+                Assert.assertEquals(value.preValue().longValue(), i);
+                Assert.assertEquals(value.postValue().longValue(), i + 1);
 
                 if ( i == 0 )
                 {
@@ -109,7 +105,7 @@ public class TestCachedAtomicCounter extends BaseClassForTests
             }
 
             value = cachedLong.next();
-            assertFalse(value.succeeded());
+            Assert.assertFalse(value.succeeded());
         }
         finally
         {
@@ -129,9 +125,9 @@ public class TestCachedAtomicCounter extends BaseClassForTests
             for ( long i = 0; i < 200; ++i )
             {
                 AtomicValue<Long>       value = cachedLong.next();
-                assertTrue(value.succeeded());
-                assertEquals(value.preValue().longValue(), i);
-                assertEquals(value.postValue().longValue(), i + 1);
+                Assert.assertTrue(value.succeeded());
+                Assert.assertEquals(value.preValue().longValue(), i);
+                Assert.assertEquals(value.postValue().longValue(), i + 1);
             }
         }
         finally

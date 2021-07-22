@@ -18,10 +18,10 @@
  */
 package org.apache.curator.x.async;
 
-import static org.junit.jupiter.api.Assertions.fail;
 import com.google.common.base.Throwables;
 import org.apache.curator.test.BaseClassForTests;
 import org.apache.curator.test.compatibility.Timing2;
+import org.testng.Assert;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -61,11 +61,11 @@ public abstract class CompletableBaseClassForTests extends BaseClassForTests
             {
                 throw (AssertionError)e.getCause();
             }
-            fail("get() failed", e);
+            Assert.fail("get() failed", e);
         }
         catch ( TimeoutException e )
         {
-            fail("get() timed out");
+            Assert.fail("get() timed out");
         }
     }
 }

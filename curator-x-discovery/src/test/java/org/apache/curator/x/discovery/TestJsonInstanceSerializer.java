@@ -18,15 +18,14 @@
  */
 package org.apache.curator.x.discovery;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.curator.x.discovery.details.JsonInstanceSerializer;
-import org.junit.jupiter.api.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class TestJsonInstanceSerializer
 {
@@ -38,15 +37,15 @@ public class TestJsonInstanceSerializer
         byte[]                          bytes = serializer.serialize(instance);
 
         ServiceInstance<String>         rhs = serializer.deserialize(bytes);
-        assertEquals(instance, rhs);
-        assertEquals(instance.getId(), rhs.getId());
-        assertEquals(instance.getName(), rhs.getName());
-        assertEquals(instance.getPayload(), rhs.getPayload());
-        assertEquals(instance.getAddress(), rhs.getAddress());
-        assertEquals(instance.getPort(), rhs.getPort());
-        assertEquals(instance.getSslPort(), rhs.getSslPort());
-        assertEquals(instance.getUriSpec(), rhs.getUriSpec());
-        assertEquals(instance.isEnabled(), rhs.isEnabled());
+        Assert.assertEquals(instance, rhs);
+        Assert.assertEquals(instance.getId(), rhs.getId());
+        Assert.assertEquals(instance.getName(), rhs.getName());
+        Assert.assertEquals(instance.getPayload(), rhs.getPayload());
+        Assert.assertEquals(instance.getAddress(), rhs.getAddress());
+        Assert.assertEquals(instance.getPort(), rhs.getPort());
+        Assert.assertEquals(instance.getSslPort(), rhs.getSslPort());
+        Assert.assertEquals(instance.getUriSpec(), rhs.getUriSpec());
+        Assert.assertEquals(instance.isEnabled(), rhs.isEnabled());
     }
 
     @Test
@@ -59,7 +58,7 @@ public class TestJsonInstanceSerializer
         try
         {
             doubleSerializer.deserialize(bytes);
-            fail();
+            Assert.fail();
         }
         catch ( ClassCastException e )
         {
@@ -75,15 +74,15 @@ public class TestJsonInstanceSerializer
         byte[]                          bytes = serializer.serialize(instance);
 
         ServiceInstance<Void>           rhs = serializer.deserialize(bytes);
-        assertEquals(instance, rhs);
-        assertEquals(instance.getId(), rhs.getId());
-        assertEquals(instance.getName(), rhs.getName());
-        assertEquals(instance.getPayload(), rhs.getPayload());
-        assertEquals(instance.getAddress(), rhs.getAddress());
-        assertEquals(instance.getPort(), rhs.getPort());
-        assertEquals(instance.getSslPort(), rhs.getSslPort());
-        assertEquals(instance.getUriSpec(), rhs.getUriSpec());
-        assertEquals(instance.isEnabled(), rhs.isEnabled());
+        Assert.assertEquals(instance, rhs);
+        Assert.assertEquals(instance.getId(), rhs.getId());
+        Assert.assertEquals(instance.getName(), rhs.getName());
+        Assert.assertEquals(instance.getPayload(), rhs.getPayload());
+        Assert.assertEquals(instance.getAddress(), rhs.getAddress());
+        Assert.assertEquals(instance.getPort(), rhs.getPort());
+        Assert.assertEquals(instance.getSslPort(), rhs.getSslPort());
+        Assert.assertEquals(instance.getUriSpec(), rhs.getUriSpec());
+        Assert.assertEquals(instance.isEnabled(), rhs.isEnabled());
     }
 
     @Test
@@ -93,7 +92,7 @@ public class TestJsonInstanceSerializer
         byte[]                          bytes = "{}".getBytes("utf-8");
 
         ServiceInstance<Void>           instance = serializer.deserialize(bytes);
-        assertTrue(instance.isEnabled(), "Instance that has no 'enabled' should be assumed enabled");
+        Assert.assertTrue(instance.isEnabled(), "Instance that has no 'enabled' should be assumed enabled");
     }
 
     @Test
@@ -107,15 +106,15 @@ public class TestJsonInstanceSerializer
         byte[]                            bytes = serializer.serialize(instance);
 
         ServiceInstance<Object>           rhs = serializer.deserialize(bytes);
-        assertEquals(instance, rhs);
-        assertEquals(instance.getId(), rhs.getId());
-        assertEquals(instance.getName(), rhs.getName());
-        assertEquals(instance.getPayload(), rhs.getPayload());
-        assertEquals(instance.getAddress(), rhs.getAddress());
-        assertEquals(instance.getPort(), rhs.getPort());
-        assertEquals(instance.getSslPort(), rhs.getSslPort());
-        assertEquals(instance.getUriSpec(), rhs.getUriSpec());
-        assertEquals(instance.isEnabled(), rhs.isEnabled());
+        Assert.assertEquals(instance, rhs);
+        Assert.assertEquals(instance.getId(), rhs.getId());
+        Assert.assertEquals(instance.getName(), rhs.getName());
+        Assert.assertEquals(instance.getPayload(), rhs.getPayload());
+        Assert.assertEquals(instance.getAddress(), rhs.getAddress());
+        Assert.assertEquals(instance.getPort(), rhs.getPort());
+        Assert.assertEquals(instance.getSslPort(), rhs.getSslPort());
+        Assert.assertEquals(instance.getUriSpec(), rhs.getUriSpec());
+        Assert.assertEquals(instance.isEnabled(), rhs.isEnabled());
     }
 
 
@@ -130,15 +129,15 @@ public class TestJsonInstanceSerializer
         byte[]                            bytes = serializer.serialize(instance);
 
         ServiceInstance<Object>           rhs = serializer.deserialize(bytes);
-        assertEquals(instance, rhs);
-        assertEquals(instance.getId(), rhs.getId());
-        assertEquals(instance.getName(), rhs.getName());
-        assertEquals(instance.getPayload(), rhs.getPayload());
-        assertEquals(instance.getAddress(), rhs.getAddress());
-        assertEquals(instance.getPort(), rhs.getPort());
-        assertEquals(instance.getSslPort(), rhs.getSslPort());
-        assertEquals(instance.getUriSpec(), rhs.getUriSpec());
-        assertEquals(instance.isEnabled(), rhs.isEnabled());
+        Assert.assertEquals(instance, rhs);
+        Assert.assertEquals(instance.getId(), rhs.getId());
+        Assert.assertEquals(instance.getName(), rhs.getName());
+        Assert.assertEquals(instance.getPayload(), rhs.getPayload());
+        Assert.assertEquals(instance.getAddress(), rhs.getAddress());
+        Assert.assertEquals(instance.getPort(), rhs.getPort());
+        Assert.assertEquals(instance.getSslPort(), rhs.getSslPort());
+        Assert.assertEquals(instance.getUriSpec(), rhs.getUriSpec());
+        Assert.assertEquals(instance.isEnabled(), rhs.isEnabled());
     }
 
     @Test
@@ -151,15 +150,15 @@ public class TestJsonInstanceSerializer
         byte[]                             bytes = serializer.serialize(instance);
 
         ServiceInstance<Payload>           rhs = serializer.deserialize(bytes);
-        assertEquals(instance, rhs);
-        assertEquals(instance.getId(), rhs.getId());
-        assertEquals(instance.getName(), rhs.getName());
-        assertEquals(instance.getPayload(), rhs.getPayload());
-        assertEquals(instance.getAddress(), rhs.getAddress());
-        assertEquals(instance.getPort(), rhs.getPort());
-        assertEquals(instance.getSslPort(), rhs.getSslPort());
-        assertEquals(instance.getUriSpec(), rhs.getUriSpec());
-        assertEquals(instance.isEnabled(), rhs.isEnabled());
+        Assert.assertEquals(instance, rhs);
+        Assert.assertEquals(instance.getId(), rhs.getId());
+        Assert.assertEquals(instance.getName(), rhs.getName());
+        Assert.assertEquals(instance.getPayload(), rhs.getPayload());
+        Assert.assertEquals(instance.getAddress(), rhs.getAddress());
+        Assert.assertEquals(instance.getPort(), rhs.getPort());
+        Assert.assertEquals(instance.getSslPort(), rhs.getSslPort());
+        Assert.assertEquals(instance.getUriSpec(), rhs.getUriSpec());
+        Assert.assertEquals(instance.isEnabled(), rhs.isEnabled());
     }
 
     public static class Payload {

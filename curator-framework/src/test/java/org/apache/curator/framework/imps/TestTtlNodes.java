@@ -18,9 +18,6 @@
  */
 package org.apache.curator.framework.imps;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.BackgroundCallback;
@@ -29,21 +26,21 @@ import org.apache.curator.retry.RetryOneTime;
 import org.apache.curator.test.compatibility.CuratorTestBase;
 import org.apache.curator.test.Timing;
 import org.apache.zookeeper.CreateMode;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 import java.util.concurrent.CountDownLatch;
 
 public class TestTtlNodes extends CuratorTestBase
 {
-    @BeforeAll
+    @BeforeClass
     public static void setUpClass() {
         System.setProperty("zookeeper.extendedTypesEnabled", "true");
     }
     
-    @BeforeEach
+    @BeforeMethod
     @Override
     public void setup() throws Exception
     {
@@ -51,7 +48,7 @@ public class TestTtlNodes extends CuratorTestBase
         super.setup();
     }
 
-    @AfterEach
+    @AfterMethod
     @Override
     public void teardown() throws Exception
     {
@@ -68,7 +65,7 @@ public class TestTtlNodes extends CuratorTestBase
 
             client.create().withTtl(10).creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT_WITH_TTL).forPath("/a/b/c");
             Thread.sleep(20);
-            assertNull(client.checkExists().forPath("/a/b/c"));
+            Assert.assertNull(client.checkExists().forPath("/a/b/c"));
         }
     }
 
@@ -89,9 +86,9 @@ public class TestTtlNodes extends CuratorTestBase
                 }
             };
             client.create().withTtl(10).creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT_WITH_TTL).inBackground(callback).forPath("/a/b/c");
-            assertTrue(new Timing().awaitLatch(latch));
+            Assert.assertTrue(new Timing().awaitLatch(latch));
             Thread.sleep(20);
-            assertNull(client.checkExists().forPath("/a/b/c"));
+            Assert.assertNull(client.checkExists().forPath("/a/b/c"));
         }
     }
 }

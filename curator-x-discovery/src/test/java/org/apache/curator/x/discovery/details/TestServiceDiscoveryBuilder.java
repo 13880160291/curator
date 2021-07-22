@@ -18,10 +18,6 @@
  */
 package org.apache.curator.x.discovery.details;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryOneTime;
@@ -29,10 +25,10 @@ import org.apache.curator.test.BaseClassForTests;
 import org.apache.curator.test.compatibility.CuratorTestBase;
 import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
 import org.apache.curator.x.discovery.ServiceInstance;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
-@Tag(CuratorTestBase.zk35TestCompatibilityGroup)
+@Test(groups = CuratorTestBase.zk35TestCompatibilityGroup)
 public class TestServiceDiscoveryBuilder extends BaseClassForTests
 {
     @Test
@@ -42,8 +38,8 @@ public class TestServiceDiscoveryBuilder extends BaseClassForTests
         ServiceDiscoveryBuilder<Object> builder = ServiceDiscoveryBuilder.builder(Object.class).client(client);
         ServiceDiscoveryImpl<?> discovery = (ServiceDiscoveryImpl<?>) builder.basePath("/path").build();
 
-        assertNotNull(discovery.getSerializer(), "default serializer not set");
-        assertTrue(discovery.getSerializer() instanceof JsonInstanceSerializer, "default serializer not JSON");
+        Assert.assertNotNull(discovery.getSerializer(), "default serializer not set");
+        Assert.assertTrue(discovery.getSerializer() instanceof JsonInstanceSerializer, "default serializer not JSON");
     }
 
     @Test
@@ -67,7 +63,7 @@ public class TestServiceDiscoveryBuilder extends BaseClassForTests
         });
 
         ServiceDiscoveryImpl<?> discovery = (ServiceDiscoveryImpl<?>) builder.basePath("/path").build();
-        assertNotNull(discovery.getSerializer(), "default serializer not set");
-        assertFalse(discovery.getSerializer() instanceof JsonInstanceSerializer, "set serializer is JSON");
+        Assert.assertNotNull(discovery.getSerializer(), "default serializer not set");
+        Assert.assertFalse(discovery.getSerializer() instanceof JsonInstanceSerializer, "set serializer is JSON");
     }
 }

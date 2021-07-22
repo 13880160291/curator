@@ -19,16 +19,8 @@
 
 package org.apache.curator.framework;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.curator.CuratorZookeeperClient;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.ensemble.EnsembleProvider;
 import org.apache.curator.ensemble.fixed.FixedEnsembleProvider;
@@ -49,10 +41,15 @@ import org.apache.curator.utils.ZookeeperFactory;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.client.ZKClientConfig;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import org.apache.curator.CuratorZookeeperClient;
 
 /**
  * Factory methods for creating framework-style clients
@@ -111,29 +108,6 @@ public class CuratorFrameworkFactory
             retryPolicy(retryPolicy).
             build();
     }
-    
-    /**
-     * Create a new client
-     *
-     * @param connectString       list of servers to connect to
-     * @param sessionTimeoutMs    session timeout
-     * @param connectionTimeoutMs connection timeout
-     * @param retryPolicy         retry policy to use
-     * @param zkClientConfig      ZKClientConfig
-     * @return client
-     * 
-     * @since 5.1.1, supported from ZooKeeper 3.6.1 and above.
-     */
-    public static CuratorFramework newClient(String connectString, int sessionTimeoutMs, int connectionTimeoutMs, RetryPolicy retryPolicy, ZKClientConfig zkClientConfig)
-    {
-        return builder().
-            connectString(connectString).
-            sessionTimeoutMs(sessionTimeoutMs).
-            connectionTimeoutMs(connectionTimeoutMs).
-            retryPolicy(retryPolicy).
-            zkClientConfig(zkClientConfig).
-            build();
-    }
 
     /**
      * Return the local address as bytes that can be used as a node payload
@@ -176,7 +150,6 @@ public class CuratorFrameworkFactory
         private Executor runSafeService = null;
         private ConnectionStateListenerManagerFactory connectionStateListenerManagerFactory = ConnectionStateListenerManagerFactory.standard;
         private int simulatedSessionExpirationPercent = 100;
-        private ZKClientConfig zkClientConfig;
 
         /**
          * Apply the current values and build a new CuratorFramework
@@ -493,11 +466,6 @@ public class CuratorFrameworkFactory
             this.simulatedSessionExpirationPercent = simulatedSessionExpirationPercent;
             return this;
         }
-        
-        public Builder zkClientConfig(ZKClientConfig zkClientConfig) {
-        	this.zkClientConfig = zkClientConfig;
-        	return this;
-        }
 
         /**
          * Add an enforced schema set
@@ -615,10 +583,6 @@ public class CuratorFrameworkFactory
 
         public int getSimulatedSessionExpirationPercent() {
             return simulatedSessionExpirationPercent;
-        }
-        
-        public ZKClientConfig getZkClientConfig() {
-            return zkClientConfig;
         }
 
         public SchemaSet getSchemaSet()

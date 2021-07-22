@@ -18,36 +18,32 @@
  */
 package org.apache.curator.framework;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.apache.curator.retry.RetryOneTime;
 import org.apache.curator.test.compatibility.CuratorTestBase;
 import org.apache.curator.x.async.AsyncCuratorFramework;
-import org.junit.jupiter.api.Test;
+import org.testng.annotations.Test;
 
 public class TestCompatibility extends CuratorTestBase
 {
-    @Test
-    public void testPersistentWatchesNotAvailable()
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testPersistentWatchesNotAvailable() throws Exception
     {
-        assertThrows(IllegalStateException.class, ()-> {
-            try (CuratorFramework client = CuratorFrameworkFactory.newClient(server.getConnectString(), new RetryOneTime(1))) {
-                client.start();
-                client.watchers().add().forPath("/foo");
-            }
-        });
+        try ( CuratorFramework client = CuratorFrameworkFactory.newClient(server.getConnectString(), new RetryOneTime(1)) )
+        {
+            client.start();
+            client.watchers().add().forPath("/foo");
+        }
     }
 
-    @Test
+    @Test(expectedExceptions = IllegalStateException.class)
     public void testPersistentWatchesNotAvailableAsync()
     {
-        assertThrows(IllegalStateException.class, ()->{
-            try ( CuratorFramework client = CuratorFrameworkFactory.newClient(server.getConnectString(), new RetryOneTime(1)) )
-            {
-                client.start();
+        try ( CuratorFramework client = CuratorFrameworkFactory.newClient(server.getConnectString(), new RetryOneTime(1)) )
+        {
+            client.start();
 
-                AsyncCuratorFramework async = AsyncCuratorFramework.wrap(client);
-                async.addWatch().forPath("/foo");
-            }
-        });
+            AsyncCuratorFramework async = AsyncCuratorFramework.wrap(client);
+            async.addWatch().forPath("/foo");
+        }
     }
 }

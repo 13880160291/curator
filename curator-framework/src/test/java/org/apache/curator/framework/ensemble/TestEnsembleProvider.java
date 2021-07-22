@@ -18,8 +18,6 @@
  */
 package org.apache.curator.framework.ensemble;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.apache.curator.ensemble.EnsembleProvider;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -30,10 +28,11 @@ import org.apache.curator.test.BaseClassForTests;
 import org.apache.curator.test.TestingServer;
 import org.apache.curator.test.Timing;
 import org.apache.curator.utils.CloseableUtils;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 public class TestEnsembleProvider extends BaseClassForTests
 {
@@ -47,7 +46,7 @@ public class TestEnsembleProvider extends BaseClassForTests
         try
         {
             client.start();
-            assertTrue(timing.acquireSemaphore(counter));
+            Assert.assertTrue(timing.acquireSemaphore(counter));
         }
         finally
         {
@@ -88,20 +87,20 @@ public class TestEnsembleProvider extends BaseClassForTests
             client.getConnectionStateListenable().addListener(listener);
             client.start();
 
-            assertTrue(timing.awaitLatch(connectedLatch));
+            Assert.assertTrue(timing.awaitLatch(connectedLatch));
 
             server.stop();
 
-            assertTrue(timing.awaitLatch(lostLatch));
+            Assert.assertTrue(timing.awaitLatch(lostLatch));
             counter.drainPermits();
             for ( int i = 0; i < 5; ++i )
             {
                 // the ensemble provider should still be called periodically when the connection is lost
-                assertTrue(timing.acquireSemaphore(counter), "Failed when i is: " + i);
+                Assert.assertTrue(timing.acquireSemaphore(counter), "Failed when i is: " + i);
             }
 
             server = new TestingServer();   // this changes the CountingEnsembleProvider's value for getConnectionString() - connection should notice this and recover
-            assertTrue(timing.awaitLatch(reconnectedLatch));
+            Assert.assertTrue(timing.awaitLatch(reconnectedLatch));
         }
         finally
         {

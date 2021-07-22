@@ -18,8 +18,6 @@
  */
 package org.apache.curator.framework.imps;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryOneTime;
@@ -29,8 +27,8 @@ import org.apache.curator.x.async.AsyncCuratorFramework;
 import org.apache.zookeeper.AddWatchMode;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.concurrent.CountDownLatch;
 
 public class TestAddWatch extends CuratorTestBase
@@ -54,7 +52,7 @@ public class TestAddWatch extends CuratorTestBase
             client.create().forPath("/test/a/b/c");
             client.create().forPath("/test/a/b/c/d");
 
-            assertTrue(timing.awaitLatch(latch));
+            Assert.assertTrue(timing.awaitLatch(latch));
         }
     }
 
@@ -83,7 +81,7 @@ public class TestAddWatch extends CuratorTestBase
             client.create().forPath("/test/a/b/c");
             client.create().forPath("/test/a/b/c/d");
 
-            assertTrue(timing.awaitLatch(latch));
+            Assert.assertTrue(timing.awaitLatch(latch));
         }
     }
 }

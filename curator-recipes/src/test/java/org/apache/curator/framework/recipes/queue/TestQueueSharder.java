@@ -18,9 +18,6 @@
  */
 package org.apache.curator.framework.recipes.queue;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.google.common.collect.Sets;
 import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 import org.apache.curator.framework.CuratorFramework;
@@ -31,8 +28,8 @@ import org.apache.curator.retry.RetryOneTime;
 import org.apache.curator.test.BaseClassForTests;
 import org.apache.curator.test.Timing;
 import org.apache.curator.utils.CloseableUtils;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -82,13 +79,13 @@ public class TestQueueSharder extends BaseClassForTests
             for ( String path : sharder.getQueuePaths() )
             {
                 int numChildren = client.checkExists().forPath(path).getNumChildren();
-                assertTrue(numChildren > 0);
-                assertTrue(numChildren >= (threshold * .1));
+                Assert.assertTrue(numChildren > 0);
+                Assert.assertTrue(numChildren >= (threshold * .1));
                 statistics.addValue(numChildren);
             }
             latch.countDown();
 
-            assertTrue(statistics.getMean() >= (threshold * .9));
+            Assert.assertTrue(statistics.getMean() >= (threshold * .9));
         }
         finally
         {
@@ -122,9 +119,9 @@ public class TestQueueSharder extends BaseClassForTests
             }
             timing.sleepABit();
 
-            assertTrue((sharder1.getShardQty() > 1) || (sharder2.getShardQty() > 1));
+            Assert.assertTrue((sharder1.getShardQty() > 1) || (sharder2.getShardQty() > 1));
             timing.forWaiting().sleepABit();
-            assertEquals(sharder1.getShardQty(), sharder2.getShardQty());
+            Assert.assertEquals(sharder1.getShardQty(), sharder2.getShardQty());
         }
         finally
         {
@@ -163,17 +160,17 @@ public class TestQueueSharder extends BaseClassForTests
             sharder.getQueue().put("eight");
             timing.sleepABit();
 
-            assertTrue(sharder.getShardQty() > 1);
+            Assert.assertTrue(sharder.getShardQty() > 1);
 
             Set<String>             consumed = Sets.newHashSet();
             for ( int i = 0; i < 8; ++i )
             {
                 String s = consumer.take(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS);
-                assertNotNull(s);
+                Assert.assertNotNull(s);
                 consumed.add(s);
             }
 
-            assertEquals(consumed, Sets.newHashSet("one", "two", "three", "four", "five", "six", "seven", "eight"));
+            Assert.assertEquals(consumed, Sets.newHashSet("one", "two", "three", "four", "five", "six", "seven", "eight"));
 
             int         shardQty = sharder.getShardQty();
             sharder.close();
@@ -182,7 +179,7 @@ public class TestQueueSharder extends BaseClassForTests
 
             sharder = new QueueSharder<String, DistributedQueue<String>>(client, distributedQueueAllocator, "/queues", "/leader", policies);
             sharder.start();
-            assertEquals(sharder.getShardQty(), shardQty);
+            Assert.assertEquals(sharder.getShardQty(), shardQty);
         }
         finally
         {

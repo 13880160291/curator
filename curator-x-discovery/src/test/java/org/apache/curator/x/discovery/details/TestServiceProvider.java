@@ -18,8 +18,6 @@
  */
 package org.apache.curator.x.discovery.details;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.Closeable;
 import java.util.Collections;
 import java.util.List;
@@ -34,11 +32,12 @@ import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.ServiceProvider;
-import com.google.common.collect.Lists;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
-@Tag(CuratorTestBase.zk35TestCompatibilityGroup)
+import com.google.common.collect.Lists;
+
+@Test(groups = CuratorTestBase.zk35TestCompatibilityGroup)
 public class TestServiceProvider extends BaseClassForTests
 {
 
@@ -61,11 +60,11 @@ public class TestServiceProvider extends BaseClassForTests
             closeables.add(provider);
             provider.start();
 
-            assertEquals(provider.getInstance(), instance);
+            Assert.assertEquals(provider.getInstance(), instance);
 
             List<ServiceInstance<String>> list = Lists.newArrayList();
             list.add(instance);
-            assertEquals(provider.getAllInstances(), list);
+            Assert.assertEquals(provider.getAllInstances(), list);
         }
         finally
         {
@@ -97,8 +96,8 @@ public class TestServiceProvider extends BaseClassForTests
             closeables.add(provider);
             provider.start();
 
-            assertEquals(provider.getInstance(), null);
-            assertTrue(provider.getAllInstances().isEmpty(), "Disabled instance still appears available via service provider");
+            Assert.assertEquals(provider.getInstance(), null);
+            Assert.assertTrue(provider.getAllInstances().isEmpty(), "Disabled instance still appears available via service provider");
         }
         finally
         {

@@ -27,20 +27,13 @@ import org.apache.curator.retry.RetryOneTime;
 import org.apache.curator.test.BaseClassForTests;
 import org.apache.curator.test.Timing;
 import org.apache.curator.utils.CloseableUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BaseTestTreeCache extends BaseClassForTests
 {
@@ -103,7 +96,7 @@ public class BaseTestTreeCache extends BaseClassForTests
     }
 
     @Override
-    @BeforeEach
+    @BeforeMethod(alwaysRun = true)
     public void setup() throws Exception
     {
         super.setup();
@@ -118,14 +111,14 @@ public class BaseTestTreeCache extends BaseClassForTests
     }
 
     @Override
-    @AfterEach
+    @AfterMethod(alwaysRun = true)
     public void teardown() throws Exception
     {
         try
         {
             try
             {
-                assertFalse(hadBackgroundException.get(), "Background exceptions were thrown, see stderr for details");
+                Assert.assertFalse(hadBackgroundException.get(), "Background exceptions were thrown, see stderr for details");
                 assertNoMoreEvents();
             }
             finally
@@ -146,7 +139,7 @@ public class BaseTestTreeCache extends BaseClassForTests
     void assertNoMoreEvents() throws InterruptedException
     {
         timing.sleepABit();
-        assertTrue(events.isEmpty(), String.format("Expected no events, found %d; first event: %s", events.size(), events.peek()));
+        Assert.assertTrue(events.isEmpty(), String.format("Expected no events, found %d; first event: %s", events.size(), events.peek()));
     }
 
     /**
@@ -176,7 +169,7 @@ public class BaseTestTreeCache extends BaseClassForTests
     TreeCacheEvent assertEvent(TreeCacheEvent.Type expectedType, String expectedPath, byte[] expectedData, boolean ignoreConnectionEvents) throws InterruptedException
     {
         TreeCacheEvent event = events.poll(timing.forWaiting().seconds(), TimeUnit.SECONDS);
-        assertNotNull(event, String.format("Expected type: %s, path: %s", expectedType, expectedPath));
+        Assert.assertNotNull(event, String.format("Expected type: %s, path: %s", expectedType, expectedPath));
         if ( ignoreConnectionEvents )
         {
             if ( (event.getType() == TreeCacheEvent.Type.CONNECTION_SUSPENDED) || (event.getType() == TreeCacheEvent.Type.CONNECTION_LOST) || (event.getType() == TreeCacheEvent.Type.CONNECTION_RECONNECTED) )
@@ -186,28 +179,28 @@ public class BaseTestTreeCache extends BaseClassForTests
         }
 
         String message = event.toString();
-        assertEquals(event.getType(), expectedType, message);
+        Assert.assertEquals(event.getType(), expectedType, message);
         if ( expectedPath == null )
         {
-            assertNull(event.getData(), message);
+            Assert.assertNull(event.getData(), message);
         }
         else
         {
-            assertNotNull(event.getData(), message);
-            assertEquals(event.getData().getPath(), expectedPath, message);
+            Assert.assertNotNull(event.getData(), message);
+            Assert.assertEquals(event.getData().getPath(), expectedPath, message);
         }
         if ( expectedData != null )
         {
-            assertArrayEquals(event.getData().getData(), expectedData, message);
+            Assert.assertEquals(event.getData().getData(), expectedData, message);
         }
 
         if ( event.getType() == TreeCacheEvent.Type.NODE_UPDATED)
         {
-            assertNotNull(event.getOldData());
+            Assert.assertNotNull(event.getOldData());
         }
         else
         {
-            assertNull(event.getOldData());
+            Assert.assertNull(event.getOldData());
         }
 
         return event;

@@ -18,35 +18,27 @@
  */
 package org.apache.curator.framework.imps;
 
-import static org.apache.zookeeper.ZooDefs.Ids.ANYONE_ID_UNSAFE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.ACLProvider;
 import org.apache.curator.framework.api.BackgroundCallback;
-import org.apache.curator.framework.api.CreateBuilderMain;
 import org.apache.curator.framework.api.CuratorEvent;
 import org.apache.curator.retry.RetryOneTime;
 import org.apache.curator.test.BaseClassForTests;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.curator.utils.ZKPaths;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
-import org.apache.zookeeper.data.Stat;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.apache.zookeeper.ZooDefs.Ids.ANYONE_ID_UNSAFE;
 
 public class TestCreate extends BaseClassForTests
 {
@@ -99,9 +91,9 @@ public class TestCreate extends BaseClassForTests
             List<ACL> acl = Collections.singletonList(new ACL(ZooDefs.Perms.CREATE | ZooDefs.Perms.READ, ANYONE_ID_UNSAFE));
             client.create().creatingParentsIfNeeded().withACL(acl).forPath(path);
             List<ACL> actual_bar_foo = client.getACL().forPath(path);
-            assertEquals(actual_bar_foo, acl);
+            Assert.assertEquals(actual_bar_foo, acl);
             List<ACL> actual_bar = client.getACL().forPath("/bar");
-            assertEquals(actual_bar, ZooDefs.Ids.OPEN_ACL_UNSAFE);
+            Assert.assertEquals(actual_bar, ZooDefs.Ids.OPEN_ACL_UNSAFE);
         }
         finally
         {
@@ -121,9 +113,9 @@ public class TestCreate extends BaseClassForTests
             List<ACL> acl = Collections.singletonList(new ACL(ZooDefs.Perms.CREATE | ZooDefs.Perms.READ, ANYONE_ID_UNSAFE));
             client.create().creatingParentsIfNeeded().withACL(acl, true).forPath(path);
             List<ACL> actual_bar_foo = client.getACL().forPath(path);
-            assertEquals(actual_bar_foo, acl);
+            Assert.assertEquals(actual_bar_foo, acl);
             List<ACL> actual_bar = client.getACL().forPath("/bar");
-            assertEquals(actual_bar, acl);
+            Assert.assertEquals(actual_bar, acl);
         }
         finally
         {
@@ -153,11 +145,11 @@ public class TestCreate extends BaseClassForTests
                 }
             };
             client.create().creatingParentsIfNeeded().withACL(acl).inBackground(callback).forPath(path);
-            assertTrue(latch.await(2000, TimeUnit.MILLISECONDS), "Callback not invoked");
+            Assert.assertTrue(latch.await(2000, TimeUnit.MILLISECONDS), "Callback not invoked");
             List<ACL> actual_bar_foo = client.getACL().forPath(path);
-            assertEquals(actual_bar_foo, acl);
+            Assert.assertEquals(actual_bar_foo, acl);
             List<ACL> actual_bar = client.getACL().forPath("/bar");
-            assertEquals(actual_bar, ZooDefs.Ids.OPEN_ACL_UNSAFE);
+            Assert.assertEquals(actual_bar, ZooDefs.Ids.OPEN_ACL_UNSAFE);
         }
         finally
         {
@@ -184,11 +176,11 @@ public class TestCreate extends BaseClassForTests
                 }
             };
             client.create().creatingParentsIfNeeded().withACL(acl, true).inBackground(callback).forPath(path);
-            assertTrue(latch.await(2000, TimeUnit.MILLISECONDS), "Callback not invoked");
+            Assert.assertTrue(latch.await(2000, TimeUnit.MILLISECONDS), "Callback not invoked");
             List<ACL> actual_bar_foo = client.getACL().forPath(path);
-            assertEquals(actual_bar_foo, acl);
+            Assert.assertEquals(actual_bar_foo, acl);
             List<ACL> actual_bar = client.getACL().forPath("/bar");
-            assertEquals(actual_bar, acl);
+            Assert.assertEquals(actual_bar, acl);
         }
         finally
         {
@@ -210,11 +202,11 @@ public class TestCreate extends BaseClassForTests
             String path = "/bar/foo/boo";
             client.create().creatingParentsIfNeeded().forPath(path);
             List<ACL> actual_bar_foo_boo = client.getACL().forPath("/bar/foo/boo");
-            assertEquals(actual_bar_foo_boo, ZooDefs.Ids.OPEN_ACL_UNSAFE);
+            Assert.assertEquals(actual_bar_foo_boo, ZooDefs.Ids.OPEN_ACL_UNSAFE);
             List<ACL> actual_bar_foo = client.getACL().forPath("/bar/foo");
-            assertEquals(actual_bar_foo, READ_CREATE_WRITE);
+            Assert.assertEquals(actual_bar_foo, READ_CREATE_WRITE);
             List<ACL> actual_bar = client.getACL().forPath("/bar");
-            assertEquals(actual_bar, READ_CREATE);
+            Assert.assertEquals(actual_bar, READ_CREATE);
         }
         finally
         {
@@ -245,205 +237,13 @@ public class TestCreate extends BaseClassForTests
 
             final String path = "/bar/foo/boo";
             client.create().creatingParentsIfNeeded().inBackground(callback).forPath(path);
-            assertTrue(latch.await(2000, TimeUnit.MILLISECONDS), "Callback not invoked");
+            Assert.assertTrue(latch.await(2000, TimeUnit.MILLISECONDS), "Callback not invoked");
             List<ACL> actual_bar_foo_boo = client.getACL().forPath(path);
-            assertEquals(actual_bar_foo_boo, ZooDefs.Ids.OPEN_ACL_UNSAFE);
+            Assert.assertEquals(actual_bar_foo_boo, ZooDefs.Ids.OPEN_ACL_UNSAFE);
             List<ACL> actual_bar_foo = client.getACL().forPath("/bar/foo");
-            assertEquals(actual_bar_foo, READ_CREATE_WRITE);
+            Assert.assertEquals(actual_bar_foo, READ_CREATE_WRITE);
             List<ACL> actual_bar = client.getACL().forPath("/bar");
-            assertEquals(actual_bar, READ_CREATE);
-        }
-        finally
-        {
-            CloseableUtils.closeQuietly(client);
-        }
-    }
-
-    private void check(CuratorFramework client, CreateBuilderMain builder, String path, byte[] data, boolean expectedSuccess) throws Exception
-    {
-        int expectedCode = (expectedSuccess) ? KeeperException.Code.OK.intValue() : KeeperException.Code.NODEEXISTS.intValue();
-        try
-        {
-            builder.forPath(path, data);
-            assertEquals(expectedCode, KeeperException.Code.OK.intValue());
-            Stat stat = new Stat();
-            byte[] actualData = client.getData().storingStatIn(stat).forPath(path);
-            assertTrue(IdempotentUtils.matches(0, data, stat.getVersion(), actualData));
-        }
-        catch (KeeperException e)
-        {
-            assertEquals(expectedCode, e.getCode());
-        }
-    }
-
-    private void checkBackground(CuratorFramework client, CreateBuilderMain builder, String path, byte[] data, boolean expectedSuccess) throws Exception
-    {
-        int expectedCode = (expectedSuccess) ? KeeperException.Code.OK.intValue() : KeeperException.Code.NODEEXISTS.intValue();
-        AtomicInteger actualCode = new AtomicInteger(-1);
-        CountDownLatch latch = new CountDownLatch(1);
-
-        BackgroundCallback callback = new BackgroundCallback()
-        {
-            @Override
-            public void processResult(CuratorFramework client, CuratorEvent event) throws Exception
-            {
-                actualCode.set(event.getResultCode());
-                latch.countDown();
-            }
-        };
-
-        builder.inBackground(callback).forPath(path, data);
-
-        assertTrue(latch.await(5000, TimeUnit.MILLISECONDS), "Callback not invoked");
-        assertEquals(expectedCode, actualCode.get());
-
-        if (expectedCode == KeeperException.Code.OK.intValue())
-        {
-            Stat stat = new Stat();
-            byte[] actualData = client.getData().storingStatIn(stat).forPath(path);
-            assertTrue(IdempotentUtils.matches(0, data, stat.getVersion(), actualData));
-        }
-    }
-
-    private CreateBuilderMain clBefore(CreateBuilderMain builder)
-    {
-        ((CreateBuilderImpl)builder).failBeforeNextCreateForTesting = true;
-        return builder;
-    }
-
-    private CreateBuilderMain clAfter(CreateBuilderMain builder)
-    {
-        ((CreateBuilderImpl)builder).failNextCreateForTesting = true;
-        return builder;
-    }
-
-    private CreateBuilderMain clCheck(CreateBuilderMain builder)
-    {
-        ((CreateBuilderImpl)builder).failNextIdempotentCheckForTesting = true;
-        return builder;
-    }
-
-    /**
-     * Tests that NodeExists on failNextCreate doesn't hang in background
-     */
-    @Test
-    public void testBackgroundFaultInjectionHang() throws Exception
-    {
-        CuratorFramework client = createClient(new DefaultACLProvider());
-        try
-        {
-            client.start();
-
-            Stat stat = new Stat();
-
-            String path = "/create";
-            byte[] data = new byte[] {1, 2};
-
-            CreateBuilderMain create = client.create();
-            check(client, create, path, data, true);
-
-            checkBackground(client, clAfter(client.create()), path, data, false);
-        }
-        finally
-        {
-            CloseableUtils.closeQuietly(client);
-        }
-    }
-
-    /**
-     * Tests all cases of idempotent create
-     */
-    @Test
-    public void testIdempotentCreate() throws Exception
-    {
-        CuratorFramework client = createClient(new DefaultACLProvider());
-        try
-        {
-            client.start();
-
-            Stat stat = new Stat();
-
-            String path = "/idpcreate";
-            String pathBack = "/idpcreateback";
-            byte[] data1 = new byte[] {1, 2, 3};
-            byte[] data2 = new byte[] {4, 5, 6};
-
-            // check foreground and backgroud
-
-            // first create should succeed
-            check(client, client.create().idempotent(), path, data1, true);
-            checkBackground(client, client.create().idempotent(), pathBack, data1, true);
-
-            // repeating the same op should succeed
-            check(client, client.create().idempotent(), path, data1, true);
-            checkBackground(client, client.create().idempotent(), pathBack, data1, true);
-
-            // same op with different data should fail even though version matches
-            check(client, client.create().idempotent(), path, data2, false);
-            checkBackground(client, client.create().idempotent(), pathBack, data2, false);
-
-            // now set data to new version
-            client.setData().forPath(path, data2);
-            client.setData().forPath(pathBack, data2);
-
-            // version should now be 1 so both versions should fail
-            check(client, client.create().idempotent(), path, data1, false);
-            checkBackground(client, client.create().idempotent(), pathBack, data1, false);
-
-            check(client, client.create().idempotent(), path, data2, false);
-            checkBackground(client, client.create().idempotent(), pathBack, data2, false);
-        }
-        finally
-        {
-            CloseableUtils.closeQuietly(client);
-        }
-    }
-
-    // Test that idempotent create automatically retries successfully upon connectionLoss
-    @Test
-    public void testIdempotentCreateConnectionLoss() throws Exception {
-        CuratorFramework client = createClient(new DefaultACLProvider());
-        try
-        {
-            client.start();
-            String path1 = "/idpcreate1";
-            String path2 = "/idpcreate2";
-            String path3 = "/create3";
-            String path4 = "/create4";
-            byte[] data = new byte[] {1, 2, 3};
-            byte[] data2 = new byte[] {1, 2, 3, 4};
-
-            // check foreground and background
-
-            // Test that idempotent create succeeds with connection loss before or after first create
-            check(client, clBefore(client.create().idempotent()), path1, data, true);
-            checkBackground(client, clBefore(client.create().idempotent()), path1+"back", data, true);
-            check(client, clAfter(client.create().idempotent()), path2, data, true);
-            checkBackground(client, clAfter(client.create().idempotent()), path2+"back", data, true);
-
-            // Test that repeating same operation succeeds, even with connection loss before/after/check
-            check(client, clBefore(client.create().idempotent()), path1, data, true);
-            checkBackground(client, clBefore(client.create().idempotent()), path1+"back", data, true);
-            check(client, clAfter(client.create().idempotent()), path2, data, true);
-            checkBackground(client, clAfter(client.create().idempotent()), path2+"back", data, true);
-            check(client, clCheck(client.create().idempotent()), path2, data, true);
-            checkBackground(client, clCheck(client.create().idempotent()), path2+"back", data, true);
-
-            // test that idempotent correctly fails, even after connection loss,
-            // by repeating earlier operations with different data
-            check(client, clBefore(client.create().idempotent()), path1, data2, false);
-            checkBackground(client, clBefore(client.create().idempotent()), path1+"back", data2, false);
-            check(client, clAfter(client.create().idempotent()), path2, data2, false);
-            checkBackground(client, clAfter(client.create().idempotent()), path2+"back", data2, false);
-            check(client, clCheck(client.create().idempotent()), path2, data2, false);
-            checkBackground(client, clCheck(client.create().idempotent()), path2+"back", data2, false);
-
-            // Test that non-idempotent succeeds with CL before create, but fails with connection loss after
-            check(client, clBefore(client.create()), path3, data, true);
-            checkBackground(client, clBefore(client.create()), path3+"back", data, true);
-            check(client, clAfter(client.create()), path4, data, false);
-            checkBackground(client, clAfter(client.create()), path4+"back", data, false);
-
+            Assert.assertEquals(actual_bar, READ_CREATE);
         }
         finally
         {
@@ -462,18 +262,18 @@ public class TestCreate extends BaseClassForTests
             client.start();
             client.blockUntilConnected();
             client.create().forPath("/parent");
-            assertEquals(client.getChildren().forPath("/parent").size(), 0);
+            Assert.assertEquals(client.getChildren().forPath("/parent").size(), 0);
             client.create().withProtection().withMode(CreateMode.EPHEMERAL).forPath("/parent/test");
             final List<String> children = client.getChildren().forPath("/parent");
-            assertEquals(1, children.size());
+            Assert.assertEquals(1, children.size());
             final String testZNodeName = children.get(0);
-            assertEquals(testZNodeName.length(), ProtectedUtils.PROTECTED_PREFIX_WITH_UUID_LENGTH + "test".length());
-            assertTrue(testZNodeName.startsWith(ProtectedUtils.PROTECTED_PREFIX));
-            assertEquals(testZNodeName.charAt(ProtectedUtils.PROTECTED_PREFIX_WITH_UUID_LENGTH - 1), ProtectedUtils.PROTECTED_SEPARATOR);
-            assertTrue(ProtectedUtils.isProtectedZNode(testZNodeName));
-            assertEquals(ProtectedUtils.normalize(testZNodeName), "test");
-            assertFalse(ProtectedUtils.isProtectedZNode("parent"));
-            assertEquals(ProtectedUtils.normalize("parent"), "parent");
+            Assert.assertEquals(testZNodeName.length(), ProtectedUtils.PROTECTED_PREFIX_WITH_UUID_LENGTH + "test".length());
+            Assert.assertTrue(testZNodeName.startsWith(ProtectedUtils.PROTECTED_PREFIX));
+            Assert.assertEquals(testZNodeName.charAt(ProtectedUtils.PROTECTED_PREFIX_WITH_UUID_LENGTH - 1), ProtectedUtils.PROTECTED_SEPARATOR);
+            Assert.assertTrue(ProtectedUtils.isProtectedZNode(testZNodeName));
+            Assert.assertEquals(ProtectedUtils.normalize(testZNodeName), "test");
+            Assert.assertFalse(ProtectedUtils.isProtectedZNode("parent"));
+            Assert.assertEquals(ProtectedUtils.normalize("parent"), "parent");
         }
     }
 
@@ -481,28 +281,28 @@ public class TestCreate extends BaseClassForTests
     public void testProtectedUtils() throws Exception
     {
         String name = "_c_53345f98-9423-4e0c-a7b5-9f819e3ec2e1-yo";
-        assertTrue(ProtectedUtils.isProtectedZNode(name));
-        assertEquals(ProtectedUtils.normalize(name), "yo");
-        assertEquals(ProtectedUtils.extractProtectedId(name).get(), "53345f98-9423-4e0c-a7b5-9f819e3ec2e1");
+        Assert.assertTrue(ProtectedUtils.isProtectedZNode(name));
+        Assert.assertEquals(ProtectedUtils.normalize(name), "yo");
+        Assert.assertEquals(ProtectedUtils.extractProtectedId(name).get(), "53345f98-9423-4e0c-a7b5-9f819e3ec2e1");
         name = "c_53345f98-9423-4e0c-a7b5-9f819e3ec2e1-yo";
-        assertFalse(ProtectedUtils.isProtectedZNode(name));
-        assertEquals(ProtectedUtils.normalize(name), name);
-        assertEquals(ProtectedUtils.extractProtectedId(name), Optional.<String>empty());
+        Assert.assertFalse(ProtectedUtils.isProtectedZNode(name));
+        Assert.assertEquals(ProtectedUtils.normalize(name), name);
+        Assert.assertEquals(ProtectedUtils.extractProtectedId(name), Optional.<String>empty());
         name = "_c_53345f98-hola-4e0c-a7b5-9f819e3ec2e1-yo";
-        assertFalse(ProtectedUtils.isProtectedZNode(name));
-        assertEquals(ProtectedUtils.normalize(name), name);
-        assertEquals(ProtectedUtils.extractProtectedId(name), Optional.<String>empty());
+        Assert.assertFalse(ProtectedUtils.isProtectedZNode(name));
+        Assert.assertEquals(ProtectedUtils.normalize(name), name);
+        Assert.assertEquals(ProtectedUtils.extractProtectedId(name), Optional.<String>empty());
         name = "_c_53345f98-hola-4e0c-a7b5-9f819e3ec2e1+yo";
-        assertFalse(ProtectedUtils.isProtectedZNode(name));
-        assertEquals(ProtectedUtils.normalize(name), name);
-        assertEquals(ProtectedUtils.extractProtectedId(name), Optional.<String>empty());
+        Assert.assertFalse(ProtectedUtils.isProtectedZNode(name));
+        Assert.assertEquals(ProtectedUtils.normalize(name), name);
+        Assert.assertEquals(ProtectedUtils.extractProtectedId(name), Optional.<String>empty());
         name = "_c_53345f98-9423-4e0c-a7b5-9f819e3ec2e1-yo";
-        assertEquals(name, ProtectedUtils.toProtectedZNode("yo", "53345f98-9423-4e0c-a7b5-9f819e3ec2e1"));
-        assertEquals("yo", ProtectedUtils.toProtectedZNode("yo", null));
+        Assert.assertEquals(name, ProtectedUtils.toProtectedZNode("yo", "53345f98-9423-4e0c-a7b5-9f819e3ec2e1"));
+        Assert.assertEquals("yo", ProtectedUtils.toProtectedZNode("yo", null));
         String path = ZKPaths.makePath("hola", "yo");
-        assertEquals(ProtectedUtils.toProtectedZNodePath(path, "53345f98-9423-4e0c-a7b5-9f819e3ec2e1"), ZKPaths.makePath("hola", name));
-        assertEquals(ProtectedUtils.toProtectedZNodePath(path, null), path);
+        Assert.assertEquals(ProtectedUtils.toProtectedZNodePath(path, "53345f98-9423-4e0c-a7b5-9f819e3ec2e1"), ZKPaths.makePath("hola", name));
+        Assert.assertEquals(ProtectedUtils.toProtectedZNodePath(path, null), path);
         path = ZKPaths.makePath("hola", name);
-        assertEquals(ProtectedUtils.normalizePath(path), "/hola/yo");
+        Assert.assertEquals(ProtectedUtils.normalizePath(path), "/hola/yo");
     }
 }

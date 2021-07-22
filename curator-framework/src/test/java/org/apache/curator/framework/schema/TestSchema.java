@@ -18,9 +18,6 @@
  */
 package org.apache.curator.framework.schema;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -35,8 +32,8 @@ import org.apache.curator.test.BaseClassForTests;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.ACL;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -48,11 +45,11 @@ public class TestSchema extends BaseClassForTests
     {
         SchemaSet schemaSet = loadSchemaSet("schema1.json", null);
         Schema schema = schemaSet.getNamedSchema("test");
-        assertNotNull(schema);
+        Assert.assertNotNull(schema);
         Map<String, String> expectedMetadata = Maps.newHashMap();
         expectedMetadata.put("one", "1");
         expectedMetadata.put("two", "2");
-        assertEquals(schema.getMetadata(), expectedMetadata);
+        Assert.assertEquals(schema.getMetadata(), expectedMetadata);
 
         CuratorFramework client = newClient(schemaSet);
         try
@@ -62,9 +59,9 @@ public class TestSchema extends BaseClassForTests
             try
             {
                 String rawPath = schema.getRawPath();
-                assertEquals(rawPath, "/a/b/c");
+                Assert.assertEquals(rawPath, "/a/b/c");
                 client.create().creatingParentsIfNeeded().forPath(rawPath);
-                fail("Should've violated schema");
+                Assert.fail("Should've violated schema");
             }
             catch ( SchemaViolation dummy )
             {
@@ -107,7 +104,7 @@ public class TestSchema extends BaseClassForTests
             try
             {
                 client.create().forPath("/test", new byte[0]);
-                fail("Should've violated schema");
+                Assert.fail("Should've violated schema");
             }
             catch ( SchemaViolation dummy )
             {
@@ -134,7 +131,7 @@ public class TestSchema extends BaseClassForTests
             try
             {
                 client.create().creatingParentsIfNeeded().forPath("/a/b/c");
-                fail("Should've violated schema: test");
+                Assert.fail("Should've violated schema: test");
             }
             catch ( SchemaViolation dummy )
             {
@@ -144,7 +141,7 @@ public class TestSchema extends BaseClassForTests
             try
             {
                 client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath("/a/b/c/d/e");
-                fail("Should've violated schema: test2");
+                Assert.fail("Should've violated schema: test2");
             }
             catch ( SchemaViolation dummy )
             {
@@ -193,7 +190,7 @@ public class TestSchema extends BaseClassForTests
             try
             {
                 client.transaction().forOperations(createAPersistent, createAEphemeral);
-                fail("Should've violated schema");
+                Assert.fail("Should've violated schema");
             }
             catch ( SchemaViolation dummy )
             {
@@ -204,7 +201,7 @@ public class TestSchema extends BaseClassForTests
             try
             {
                 client.transaction().forOperations(deleteA);
-                fail("Should've violated schema");
+                Assert.fail("Should've violated schema");
             }
             catch ( SchemaViolation dummy )
             {
@@ -214,7 +211,7 @@ public class TestSchema extends BaseClassForTests
             try
             {
                 client.transaction().forOperations(createBEmptyData);
-                fail("Should've violated schema");
+                Assert.fail("Should've violated schema");
             }
             catch ( SchemaViolation dummy )
             {
@@ -225,7 +222,7 @@ public class TestSchema extends BaseClassForTests
             try
             {
                 client.transaction().forOperations(setBEmptyData);
-                fail("Should've violated schema");
+                Assert.fail("Should've violated schema");
             }
             catch ( SchemaViolation dummy )
             {
@@ -245,12 +242,12 @@ public class TestSchema extends BaseClassForTests
         String yaml = Resources.toString(Resources.getResource("schema.yaml"), Charsets.UTF_8);
         JsonNode root = new ObjectMapper(new YAMLFactory()).readTree(yaml);
         List<Schema> schemas = new SchemaSetLoader(root, null).getSchemas();
-        assertEquals(schemas.size(), 2);
-        assertEquals(schemas.get(0).getName(), "test");
-        assertEquals(schemas.get(0).getMetadata().size(), 0);
-        assertEquals(schemas.get(1).getName(), "test2");
-        assertEquals(schemas.get(1).getMetadata().size(), 2);
-        assertEquals(schemas.get(1).getMetadata().get("two"), "2");
+        Assert.assertEquals(schemas.size(), 2);
+        Assert.assertEquals(schemas.get(0).getName(), "test");
+        Assert.assertEquals(schemas.get(0).getMetadata().size(), 0);
+        Assert.assertEquals(schemas.get(1).getName(), "test2");
+        Assert.assertEquals(schemas.get(1).getMetadata().size(), 2);
+        Assert.assertEquals(schemas.get(1).getMetadata().get("two"), "2");
     }
 
     @Test
@@ -265,7 +262,7 @@ public class TestSchema extends BaseClassForTests
             try
             {
                 client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath("/exact/match");
-                fail("Should've violated schema");
+                Assert.fail("Should've violated schema");
             }
             catch ( SchemaViolation dummy )
             {
@@ -275,7 +272,7 @@ public class TestSchema extends BaseClassForTests
             try
             {
                 client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath("/exact/foo/bar");
-                fail("Should've violated schema");
+                Assert.fail("Should've violated schema");
             }
             catch ( SchemaViolation dummy )
             {
@@ -285,7 +282,7 @@ public class TestSchema extends BaseClassForTests
             try
             {
                 client.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT_SEQUENTIAL).forPath("/exact/other/bar");
-                fail("Should've violated schema");
+                Assert.fail("Should've violated schema");
             }
             catch ( SchemaViolation dummy )
             {

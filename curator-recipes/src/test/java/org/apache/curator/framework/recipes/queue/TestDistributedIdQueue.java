@@ -18,8 +18,6 @@
  */
 package org.apache.curator.framework.recipes.queue;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.google.common.collect.Lists;
 import org.apache.curator.test.BaseClassForTests;
 import org.apache.curator.utils.CloseableUtils;
@@ -28,8 +26,9 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.RetryOneTime;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -71,8 +70,8 @@ public class TestDistributedIdQueue extends BaseClassForTests
 
             queue.put(new TestQueueItem("test"), "id");
             
-            assertTrue(consumingLatch.await(10, TimeUnit.SECONDS));  // wait until consumer has it
-            assertEquals(queue.remove("id"), 0);
+            Assert.assertTrue(consumingLatch.await(10, TimeUnit.SECONDS));  // wait until consumer has it
+            Assert.assertEquals(queue.remove("id"), 0);
 
             waitLatch.countDown();
         }
@@ -109,14 +108,14 @@ public class TestDistributedIdQueue extends BaseClassForTests
             int                 iteration = 0;
             while ( consumer.size() < ITEM_QTY )
             {
-                assertTrue(++iteration < ITEM_QTY);
+                Assert.assertTrue(++iteration < ITEM_QTY);
                 Thread.sleep(1000);
             }
 
             int                 i = 0;
             for ( TestQueueItem item : consumer.getItems() )
             {
-                assertEquals(item.str, ids.get(i++));
+                Assert.assertEquals(item.str, ids.get(i++));
             }
         }
         finally
@@ -157,13 +156,13 @@ public class TestDistributedIdQueue extends BaseClassForTests
 
             queue.put(new TestQueueItem("test"), "id");
 
-            assertTrue(consumingLatch.await(10, TimeUnit.SECONDS));  // wait until consumer has it
+            Assert.assertTrue(consumingLatch.await(10, TimeUnit.SECONDS));  // wait until consumer has it
 
             // Sleep one more second
 
             Thread.sleep(1000);
 
-            assertTrue(queue.debugIsQueued("id"));
+            Assert.assertTrue(queue.debugIsQueued("id"));
 
         }
         finally

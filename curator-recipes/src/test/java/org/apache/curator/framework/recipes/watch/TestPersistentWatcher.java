@@ -19,9 +19,6 @@
 
 package org.apache.curator.framework.recipes.watch;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.state.ConnectionState;
@@ -29,14 +26,13 @@ import org.apache.curator.retry.RetryOneTime;
 import org.apache.curator.test.compatibility.CuratorTestBase;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 
-@Tag(CuratorTestBase.zk36Group)
+@Test(groups = CuratorTestBase.zk36Group)
 public class TestPersistentWatcher extends CuratorTestBase
 {
     @Test
@@ -77,22 +73,22 @@ public class TestPersistentWatcher extends CuratorTestBase
                 persistentWatcher.getListenable().addListener(events::add);
 
                 client.create().creatingParentsIfNeeded().forPath("/top/main/a");
-                assertEquals(timing.takeFromQueue(events).getPath(), "/top/main");
+                Assert.assertEquals(timing.takeFromQueue(events).getPath(), "/top/main");
                 if ( recursive )
                 {
-                    assertEquals(timing.takeFromQueue(events).getPath(), "/top/main/a");
+                    Assert.assertEquals(timing.takeFromQueue(events).getPath(), "/top/main/a");
                 }
                 else
                 {
-                    assertEquals(timing.takeFromQueue(events).getPath(), "/top/main");   // child added
+                    Assert.assertEquals(timing.takeFromQueue(events).getPath(), "/top/main");   // child added
                 }
 
                 server.stop();
-                assertEquals(timing.takeFromQueue(events).getState(), Watcher.Event.KeeperState.Disconnected);
-                assertTrue(timing.awaitLatch(lostLatch));
+                Assert.assertEquals(timing.takeFromQueue(events).getState(), Watcher.Event.KeeperState.Disconnected);
+                Assert.assertTrue(timing.awaitLatch(lostLatch));
 
                 server.restart();
-                assertTrue(timing.awaitLatch(reconnectedLatch));
+                Assert.assertTrue(timing.awaitLatch(reconnectedLatch));
 
                 timing.sleepABit();     // time to allow watcher to get reset
                 events.clear();
@@ -100,10 +96,10 @@ public class TestPersistentWatcher extends CuratorTestBase
                 if ( recursive )
                 {
                     client.setData().forPath("/top/main/a", "foo".getBytes());
-                    assertEquals(timing.takeFromQueue(events).getType(), Watcher.Event.EventType.NodeDataChanged);
+                    Assert.assertEquals(timing.takeFromQueue(events).getType(), Watcher.Event.EventType.NodeDataChanged);
                 }
                 client.setData().forPath("/top/main", "bar".getBytes());
-                assertEquals(timing.takeFromQueue(events).getPath(), "/top/main");
+                Assert.assertEquals(timing.takeFromQueue(events).getPath(), "/top/main");
             }
         }
     }

@@ -18,9 +18,6 @@
  */
 package org.apache.curator.framework.imps;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.apache.curator.test.compatibility.CuratorTestBase;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -33,8 +30,8 @@ import org.apache.curator.test.InstanceSpec;
 import org.apache.curator.test.TestingCluster;
 import org.apache.curator.test.Timing;
 import org.apache.zookeeper.CreateMode;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.concurrent.CountDownLatch;
 
 public class TestWithCluster extends CuratorTestBase
@@ -66,7 +63,7 @@ public class TestWithCluster extends CuratorTestBase
             client.getConnectionStateListenable().addListener(listener);
 
             client.create().withMode(CreateMode.EPHEMERAL).forPath("/temp", "value".getBytes());
-            assertNotNull(client.checkExists().forPath("/temp"));
+            Assert.assertNotNull(client.checkExists().forPath("/temp"));
 
             for ( InstanceSpec spec : cluster.getInstances() )
             {
@@ -76,8 +73,8 @@ public class TestWithCluster extends CuratorTestBase
                 timing.sleepABit();
             }
 
-            assertTrue(timing.awaitLatch(reconnectedLatch));
-            assertNotNull(client.checkExists().forPath("/temp"));
+            Assert.assertTrue(timing.awaitLatch(reconnectedLatch));
+            Assert.assertNotNull(client.checkExists().forPath("/temp"));
         }
         finally
         {
@@ -130,11 +127,11 @@ public class TestWithCluster extends CuratorTestBase
             {
                 if ( !instanceSpec.equals(cluster.findConnectionInstance(client.getZookeeperClient().getZooKeeper())) )
                 {
-                    assertTrue(cluster.killServer(instanceSpec));
+                    Assert.assertTrue(cluster.killServer(instanceSpec));
                 }
             }
 
-            assertTrue(timing.awaitLatch(latch));
+            Assert.assertTrue(timing.awaitLatch(latch));
         }
         finally
         {

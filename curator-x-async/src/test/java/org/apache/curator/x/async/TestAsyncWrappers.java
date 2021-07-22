@@ -18,15 +18,12 @@
  */
 package org.apache.curator.x.async;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.retry.RetryOneTime;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -41,7 +38,7 @@ public class TestAsyncWrappers extends CompletableBaseClassForTests
 
             InterProcessMutex lock = new InterProcessMutex(client, "/one/two");
             complete(AsyncWrappers.lockAsync(lock), (__, e) -> {
-                assertNull(e);
+                Assert.assertNull(e);
                 AsyncWrappers.release(lock);
             });
         }
@@ -60,7 +57,7 @@ public class TestAsyncWrappers extends CompletableBaseClassForTests
             AsyncWrappers.lockAsync(lock1).thenAccept(__ -> {
                 latch.countDown();  // don't release the lock
             });
-            assertTrue(timing.awaitLatch(latch));
+            Assert.assertTrue(timing.awaitLatch(latch));
 
             CountDownLatch latch2 = new CountDownLatch(1);
             AsyncWrappers.lockAsync(lock2, timing.forSleepingABit().milliseconds(), TimeUnit.MILLISECONDS).exceptionally(e -> {
@@ -70,7 +67,7 @@ public class TestAsyncWrappers extends CompletableBaseClassForTests
                 }
                 return null;
             });
-            assertTrue(timing.awaitLatch(latch2));
+            Assert.assertTrue(timing.awaitLatch(latch2));
         }
     }
 }

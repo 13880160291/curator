@@ -18,14 +18,6 @@
  */
 package org.apache.curator.framework.recipes.nodes;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryOneTime;
@@ -34,7 +26,8 @@ import org.apache.curator.test.Timing;
 import org.apache.curator.test.compatibility.Timing2;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.zookeeper.CreateMode;
-import org.junit.jupiter.api.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -58,7 +51,7 @@ public class TestPersistentNode extends BaseClassForTests
             try
             {
                 pen.setData(ALT_TEST_DATA);
-                fail("IllegalStateException should have been thrown");
+                Assert.fail("IllegalStateException should have been thrown");
             }
             catch ( IllegalStateException dummy )
             {
@@ -86,75 +79,20 @@ public class TestPersistentNode extends BaseClassForTests
             pen = new PersistentNode(client, CreateMode.PERSISTENT, false, "/test", TEST_DATA);
             pen.debugWaitMsForBackgroundBeforeClose.set(timing.forSleepingABit().milliseconds());
             pen.start();
-            assertTrue(pen.waitForInitialCreate(timing.milliseconds(), TimeUnit.MILLISECONDS));
+            Assert.assertTrue(pen.waitForInitialCreate(timing.milliseconds(), TimeUnit.MILLISECONDS));
             client.close(); // cause session to end - force checks that node is persistent
 
             client = CuratorFrameworkFactory.newClient(server.getConnectString(), timing.session(), timing.connection(), new RetryOneTime(1));
             client.start();
 
             byte[] bytes = client.getData().forPath("/test");
-            assertArrayEquals(bytes, TEST_DATA);
+            Assert.assertEquals(bytes, TEST_DATA);
         }
         finally
         {
             CloseableUtils.closeQuietly(pen);
             CloseableUtils.closeQuietly(client);
         }
-    }
-
-    @Test
-    public void testCreationWithParentCreationOff() throws Exception {
-        Timing2 timing = new Timing2();
-        PersistentNode pen = null;
-        CuratorFramework client = CuratorFrameworkFactory.newClient(server.getConnectString(), timing.session(), timing.connection(), new RetryOneTime(1));
-
-        try {
-            client.start();
-            pen = new PersistentNode(client, CreateMode.PERSISTENT, false, "/test/one/two", new byte[0], false);
-            pen.debugWaitMsForBackgroundBeforeClose.set(timing.forSleepingABit().milliseconds());
-            pen.start();
-            assertFalse(pen.waitForInitialCreate(timing.milliseconds(), TimeUnit.MILLISECONDS));
-            assertTrue(pen.isParentCreationFailure());
-        } finally {
-            CloseableUtils.closeQuietly(pen);
-            CloseableUtils.closeQuietly(client);
-        }
-
-    }
-
-    @Test
-    public void testRecreationWithParentCreationOff() throws Exception {
-        final byte[] TEST_DATA = "hey".getBytes();
-        Timing2 timing = new Timing2();
-        PersistentNode pen = null;
-        CuratorFramework client = CuratorFrameworkFactory.newClient(server.getConnectString(), timing.session(), timing.connection(), new RetryOneTime(1));
-
-        try {
-            client.start();
-            client.create().creatingParentsIfNeeded().forPath("/test/one");
-            pen = new PersistentNode(client, CreateMode.EPHEMERAL, false, "/test/one/two", TEST_DATA, false);
-            pen.debugWaitMsForBackgroundBeforeClose.set(timing.forSleepingABit().milliseconds());
-            pen.start();
-            assertTrue(pen.waitForInitialCreate(timing.milliseconds(), TimeUnit.MILLISECONDS));
-            assertFalse(pen.isParentCreationFailure());
-            client.delete().deletingChildrenIfNeeded().forPath("/test/one");
-            timing.sleepABit();
-
-            // persistent node should not be able to recreate itself as the lazy parent creation is disabled
-            assertNull(client.checkExists().forPath("/test/one/two"));
-            assertTrue(pen.isParentCreationFailure());
-            PersistentNode finalPen = pen;
-            assertThrows(IllegalStateException.class, () -> finalPen.setData(new byte[0]));
-
-            // The persistent node data should still be the initial one
-            assertArrayEquals(TEST_DATA, pen.getData());
-
-        } finally {
-            CloseableUtils.closeQuietly(pen);
-            CloseableUtils.closeQuietly(client);
-        }
-
-
     }
 
     @Test
@@ -170,7 +108,7 @@ public class TestPersistentNode extends BaseClassForTests
             pen.start();
             pen.close();
             timing.sleepABit();
-            assertNull(client.checkExists().forPath("/test/one/two"));
+            Assert.assertNull(client.checkExists().forPath("/test/one/two"));
         }
         finally
         {
@@ -194,7 +132,7 @@ public class TestPersistentNode extends BaseClassForTests
             pen.start();
             pen.close();
             timing.sleepABit();
-            assertNull(client.checkExists().forPath("/test/one/two"));
+            Assert.assertNull(client.checkExists().forPath("/test/one/two"));
         }
         finally
         {
@@ -202,7 +140,7 @@ public class TestPersistentNode extends BaseClassForTests
             CloseableUtils.closeQuietly(client);
         }
     }
-
+    
     @Test
     public void testEphemeralSequentialWithProtectionReconnection() throws Exception
     {
@@ -218,14 +156,14 @@ public class TestPersistentNode extends BaseClassForTests
             pen.start();
             List<String> children = client.getChildren().forPath("/test/one");
             System.out.println("children before restart: "+children);
-            assertEquals(1, children.size());
+            Assert.assertEquals(1, children.size());
             server.stop();
             timing.sleepABit();
             server.restart();
             timing.sleepABit();
             List<String> childrenAfter = client.getChildren().forPath("/test/one");
             System.out.println("children after restart: "+childrenAfter);
-            assertEquals(children, childrenAfter, "unexpected znodes: "+childrenAfter);
+            Assert.assertEquals(children, childrenAfter, "unexpected znodes: "+childrenAfter);
         }
         finally
         {

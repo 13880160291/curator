@@ -18,7 +18,6 @@
  */
 package org.apache.curator.x.discovery.server.jetty_jersey;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.sun.jersey.api.client.Client;
@@ -39,19 +38,19 @@ import org.apache.curator.x.discovery.server.entity.ServiceInstances;
 import org.apache.curator.x.discovery.server.entity.ServiceNames;
 import org.apache.curator.x.discovery.server.mocks.MockServiceDiscovery;
 import org.apache.curator.x.discovery.strategies.RandomStrategy;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
 
 public class TestStringsWithJersey
 {
-    private static final String HOST = "127.0.0.1";
     private Server server;
     private JsonServiceNamesMarshaller serviceNamesMarshaller;
     private JsonServiceInstanceMarshaller<String> serviceInstanceMarshaller;
@@ -59,7 +58,7 @@ public class TestStringsWithJersey
     private StringDiscoveryContext context;
     private int port;
 
-    @BeforeEach
+    @BeforeMethod
     public void         setup() throws Exception
     {
         context = new StringDiscoveryContext(new MockServiceDiscovery<String>(), new RandomStrategy<String>(), 1000);
@@ -97,7 +96,7 @@ public class TestStringsWithJersey
         server.start();
     }
     
-    @AfterEach
+    @AfterMethod
     public void         teardown() throws Exception
     {
         server.stop();
@@ -127,21 +126,21 @@ public class TestStringsWithJersey
             }
         };
         Client          client = Client.create(config);
-        WebResource     resource = client.resource("http://" + HOST + ":" + port);
+        WebResource     resource = client.resource("http://localhost:" + port);
         resource.path("/v1/service/test/" + service.getId()).type(MediaType.APPLICATION_JSON_TYPE).put(service);
 
         ServiceNames names = resource.path("/v1/service").get(ServiceNames.class);
-        assertEquals(names.getNames(), Lists.newArrayList("test"));
+        Assert.assertEquals(names.getNames(), Lists.newArrayList("test"));
 
         GenericType<ServiceInstances<String>> type = new GenericType<ServiceInstances<String>>(){};
         ServiceInstances<String> instances = resource.path("/v1/service/test").get(type);
-        assertEquals(instances.getServices().size(), 1);
-        assertEquals(instances.getServices().get(0), service);
+        Assert.assertEquals(instances.getServices().size(), 1);
+        Assert.assertEquals(instances.getServices().get(0), service);
 
         // Retrieve a single instance
         GenericType<ServiceInstance<String>> singleInstanceType = new GenericType<ServiceInstance<String>>(){};
         ServiceInstance<String>    instance = resource.path("/v1/service/test/" + service.getId()).get(singleInstanceType);
-        assertEquals(instance, service);
+        Assert.assertEquals(instance, service);
     }
 
     @Test
@@ -161,8 +160,8 @@ public class TestStringsWithJersey
             }
         };
         Client          client = Client.create(config);
-        WebResource     resource = client.resource("http://" + HOST + ":" + port);
+        WebResource     resource = client.resource("http://localhost:" + port);
         ServiceNames names = resource.path("/v1/service").get(ServiceNames.class);
-        assertEquals(names.getNames(), Lists.<String>newArrayList());
+        Assert.assertEquals(names.getNames(), Lists.<String>newArrayList());
     }
 }

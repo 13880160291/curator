@@ -18,7 +18,6 @@
  */
 package org.apache.curator.framework.imps;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.curator.RetryLoop;
 import org.apache.curator.drivers.OperationTrace;
 import org.apache.curator.framework.api.*;
@@ -40,11 +39,6 @@ public class DeleteBuilderImpl implements DeleteBuilder, BackgroundOperation<Str
     private boolean deletingChildrenIfNeeded;
     private boolean guaranteed;
     private boolean quietly;
-
-    @VisibleForTesting
-    boolean failNextDeleteForTesting = false;
-    @VisibleForTesting
-    boolean failBeforeNextDeleteForTesting = false;
 
     DeleteBuilderImpl(CuratorFrameworkImpl client)
     {
@@ -92,13 +86,6 @@ public class DeleteBuilderImpl implements DeleteBuilder, BackgroundOperation<Str
     {
         quietly = true;
         return this;
-    }
-
-    @Override
-    public DeleteBuilderMain idempotent()
-    {
-        // idempotent == quietly for deletes, but keep the interface to be consistent with Create/SetData
-        return quietly();
     }
 
     @Override
@@ -187,12 +174,6 @@ public class DeleteBuilderImpl implements DeleteBuilder, BackgroundOperation<Str
                         public void processResult(int rc, String path, Object ctx)
                         {
                             trace.setReturnCode(rc).setPath(path).commit();
-
-                            if ( (rc == KeeperException.Code.OK.intValue()) && failNextDeleteForTesting )
-                            {
-                                failNextDeleteForTesting = false;
-                                rc = KeeperException.Code.CONNECTIONLOSS.intValue();
-                            }
                             if ( (rc == KeeperException.Code.NOTEMPTY.intValue()) && deletingChildrenIfNeeded )
                             {
                                 backgroundDeleteChildrenThenNode(operationAndData);
@@ -261,21 +242,7 @@ public class DeleteBuilderImpl implements DeleteBuilder, BackgroundOperation<Str
                     }
                 };
             }
-            OperationAndData<String> operationAndData = new OperationAndData<String>(this, path, backgrounding.getCallback(), errorCallback, backgrounding.getContext(), null)
-            {
-                @Override
-                void callPerformBackgroundOperation() throws Exception
-                {
-                    // inject fault before performing operation
-                    if ( failBeforeNextDeleteForTesting )
-                    {
-                        failBeforeNextDeleteForTesting = false;
-                        throw new KeeperException.ConnectionLossException();
-                    }
-                    super.callPerformBackgroundOperation();
-                }
-            };
-            client.processBackgroundOperation(operationAndData, null);
+            client.processBackgroundOperation(new OperationAndData<String>(this, path, backgrounding.getCallback(), errorCallback, backgrounding.getContext(), null), null);
         }
         else
         {
@@ -302,12 +269,6 @@ public class DeleteBuilderImpl implements DeleteBuilder, BackgroundOperation<Str
                         @Override
                         public Void call() throws Exception
                         {
-                            if ( failBeforeNextDeleteForTesting )
-                            {
-                                failBeforeNextDeleteForTesting = false;
-                                throw new KeeperException.ConnectionLossException();
-                            }
-
                             try
                             {
                                 client.getZooKeeper().delete(path, version);
@@ -330,13 +291,6 @@ public class DeleteBuilderImpl implements DeleteBuilder, BackgroundOperation<Str
                                     throw e;
                                 }
                             }
-                            
-                            if ( failNextDeleteForTesting )
-                            {
-                                failNextDeleteForTesting = false;
-                                throw new KeeperException.ConnectionLossException();
-                            }
-
                             return null;
                         }
                     }

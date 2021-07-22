@@ -18,11 +18,6 @@
  */
 package org.apache.curator.x.async.modeled;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.google.common.collect.Sets;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.test.Timing;
@@ -30,9 +25,8 @@ import org.apache.curator.test.compatibility.CuratorTestBase;
 import org.apache.curator.x.async.modeled.cached.CachedModeledFramework;
 import org.apache.curator.x.async.modeled.cached.ModeledCacheListener;
 import org.apache.curator.x.async.modeled.models.TestModel;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -45,7 +39,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Tag(CuratorTestBase.zk35TestCompatibilityGroup)
+@Test(groups = CuratorTestBase.zk35TestCompatibilityGroup)
 public class TestCachedModeledFramework extends TestModeledFrameworkBase
 {
     @Test
@@ -62,7 +56,7 @@ public class TestCachedModeledFramework extends TestModeledFrameworkBase
         try
         {
             client.child(model).set(model);
-            assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
 
             CountDownLatch latch = new CountDownLatch(1);
             rawClient.getConnectionStateListenable().addListener((__, state) -> {
@@ -72,11 +66,11 @@ public class TestCachedModeledFramework extends TestModeledFrameworkBase
                 }
             });
             server.stop();
-            assertTrue(timing.awaitLatch(latch));
+            Assert.assertTrue(timing.awaitLatch(latch));
 
             complete(client.child(model).read().whenComplete((value, e) -> {
-                assertNotNull(value);
-                assertNull(e);
+                Assert.assertNotNull(value);
+                Assert.assertNull(e);
             }));
         }
         finally
@@ -99,10 +93,10 @@ public class TestCachedModeledFramework extends TestModeledFrameworkBase
         client.start();
         try
         {
-            assertFalse(timing.forSleepingABit().acquireSemaphore(semaphore));
+            Assert.assertFalse(timing.forSleepingABit().acquireSemaphore(semaphore));
 
             client.child("2").set(model2);  // set before cache is started
-            assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
         }
         finally
         {
@@ -130,7 +124,7 @@ public class TestCachedModeledFramework extends TestModeledFrameworkBase
             complete(client.child("p").child("c2").set(child2));
             complete(client.child("p").child("c1").child("g1").set(grandChild1));
             complete(client.child("p").child("c2").child("g2").set(grandChild2));
-            assertTrue(timing.awaitLatch(latch));
+            Assert.assertTrue(timing.awaitLatch(latch));
 
             complete(client.child("p").children(), (v, e) ->
             {
@@ -138,23 +132,23 @@ public class TestCachedModeledFramework extends TestModeledFrameworkBase
                     client.child("p").child("c1").modelSpec().path(),
                     client.child("p").child("c2").modelSpec().path()
                 );
-                assertEquals(v, paths);
+                Assert.assertEquals(v, paths);
             });
 
             complete(client.child("p").childrenAsZNodes(), (v, e) ->
             {
                 Set<TestModel> cachedModels = toSet(v.stream(), ZNode::model);
-                assertEquals(cachedModels, Sets.newHashSet(child1, child2));
+                Assert.assertEquals(cachedModels, Sets.newHashSet(child1, child2));
 
                 // verify that the same nodes are returned from the uncached method
                 complete(ModeledFramework.wrap(async, modelSpec).child("p").childrenAsZNodes(), (v2, e2) -> {
                     Set<TestModel> uncachedModels = toSet(v2.stream(), ZNode::model);
-                    assertEquals(cachedModels, uncachedModels);
+                    Assert.assertEquals(cachedModels, uncachedModels);
                 });
             });
 
-            complete(client.child("p").child("c1").childrenAsZNodes(), (v, e) -> assertEquals(toSet(v.stream(), ZNode::model), Sets.newHashSet(grandChild1)));
-            complete(client.child("p").child("c2").childrenAsZNodes(), (v, e) -> assertEquals(toSet(v.stream(), ZNode::model), Sets.newHashSet(grandChild2)));
+            complete(client.child("p").child("c1").childrenAsZNodes(), (v, e) -> Assert.assertEquals(toSet(v.stream(), ZNode::model), Sets.newHashSet(grandChild1)));
+            complete(client.child("p").child("c2").childrenAsZNodes(), (v, e) -> Assert.assertEquals(toSet(v.stream(), ZNode::model), Sets.newHashSet(grandChild2)));
         }
     }
 
@@ -170,13 +164,13 @@ public class TestCachedModeledFramework extends TestModeledFrameworkBase
 
             client.start();
             complete(client.child("m").set(model));
-            assertTrue(timing.awaitLatch(latch));
+            Assert.assertTrue(timing.awaitLatch(latch));
 
             // call 2 times in a row to validate CURATOR-546
             Optional<ZNode<TestModel>> optZNode = client.cache().currentData(modelSpec.path().child("m"));
-            assertEquals(optZNode.orElseThrow(() -> new AssertionError("node is missing")).model(), model);
+            Assert.assertEquals(optZNode.orElseThrow(() -> new AssertionError("node is missing")).model(), model);
             optZNode = client.cache().currentData(modelSpec.path().child("m"));
-            assertEquals(optZNode.orElseThrow(() -> new AssertionError("node is missing")).model(), model);
+            Assert.assertEquals(optZNode.orElseThrow(() -> new AssertionError("node is missing")).model(), model);
         }
     }
 

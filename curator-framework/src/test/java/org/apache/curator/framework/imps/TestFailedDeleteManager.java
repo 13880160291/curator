@@ -18,12 +18,6 @@
  */
 package org.apache.curator.framework.imps;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.BackgroundCallback;
@@ -37,7 +31,8 @@ import org.apache.curator.test.Timing;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.NoNodeException;
-import org.junit.jupiter.api.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
@@ -76,26 +71,26 @@ public class TestFailedDeleteManager extends BaseClassForTests
             client.getConnectionStateListenable().addListener(listener);
             server.stop();
 
-            assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
             try
             {
                 client.delete().guaranteed().forPath("/test-me");
-                fail();
+                Assert.fail();
             }
             catch ( KeeperException.ConnectionLossException | KeeperException.SessionExpiredException e )
             {
                 // expected
             }
-            assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
 
             timing.sleepABit();
 
             server.restart();
-            assertTrue(timing.awaitLatch(latch));
+            Assert.assertTrue(timing.awaitLatch(latch));
 
             timing.sleepABit();
 
-            assertNull(client.checkExists().forPath("/test-me"));
+            Assert.assertNull(client.checkExists().forPath("/test-me"));
         }
         finally
         {
@@ -139,26 +134,26 @@ public class TestFailedDeleteManager extends BaseClassForTests
             client.getConnectionStateListenable().addListener(listener);
             server.stop();
 
-            assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
             try
             {
                 client.delete().guaranteed().forPath("/test-me");
-                fail();
+                Assert.fail();
             }
             catch ( KeeperException.ConnectionLossException | KeeperException.SessionExpiredException e )
             {
                 // expected
             }
-            assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
 
             timing.sleepABit();
 
             server.restart();
-            assertTrue(timing.awaitLatch(latch));
+            Assert.assertTrue(timing.awaitLatch(latch));
 
             timing.sleepABit();
 
-            assertNull(client.checkExists().forPath("/test-me"));
+            Assert.assertNull(client.checkExists().forPath("/test-me"));
         }
         finally
         {
@@ -202,26 +197,26 @@ public class TestFailedDeleteManager extends BaseClassForTests
             namespaceClient.getConnectionStateListenable().addListener(listener);
             server.stop();
 
-            assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
             try
             {
                 namespaceClient.delete().guaranteed().forPath("/test-me");
-                fail();
+                Assert.fail();
             }
             catch ( KeeperException.ConnectionLossException | KeeperException.SessionExpiredException e )
             {
                 // expected
             }
-            assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
 
             timing.sleepABit();
 
             server.restart();
-            assertTrue(timing.awaitLatch(latch));
+            Assert.assertTrue(timing.awaitLatch(latch));
 
             timing.sleepABit();
 
-            assertNull(namespaceClient.checkExists().forPath("/test-me"));
+            Assert.assertNull(namespaceClient.checkExists().forPath("/test-me"));
         }
         finally
         {
@@ -242,13 +237,13 @@ public class TestFailedDeleteManager extends BaseClassForTests
         try
         {
             client.create().creatingParentsIfNeeded().forPath(PATH);
-            assertNotNull(client.checkExists().forPath(PATH));
+            Assert.assertNotNull(client.checkExists().forPath(PATH));
 
             server.stop(); // cause the next delete to fail
             try
             {
                 client.delete().forPath(PATH);
-                fail();
+                Assert.fail();
             }
             catch ( KeeperException.ConnectionLossException | KeeperException.SessionExpiredException e )
             {
@@ -256,13 +251,13 @@ public class TestFailedDeleteManager extends BaseClassForTests
             }
             
             server.restart();
-            assertNotNull(client.checkExists().forPath(PATH));
+            Assert.assertNotNull(client.checkExists().forPath(PATH));
 
             server.stop(); // cause the next delete to fail
             try
             {
                 client.delete().guaranteed().forPath(PATH);
-                fail();
+                Assert.fail();
             }
             catch ( KeeperException.ConnectionLossException | KeeperException.SessionExpiredException e )
             {
@@ -279,7 +274,7 @@ public class TestFailedDeleteManager extends BaseClassForTests
                     timing.sleepABit();
                 }
             }
-            assertNull(client.checkExists().forPath(PATH));
+            Assert.assertNull(client.checkExists().forPath(PATH));
         }
         finally
         {
@@ -308,12 +303,12 @@ public class TestFailedDeleteManager extends BaseClassForTests
         try
         {
             client.delete().guaranteed().forPath("/nonexistent");
-            fail();
+            Assert.fail();
         }
         catch(NoNodeException e)
         {
             //Exception is expected, the delete should not be retried
-            assertFalse(pathAdded.get());
+            Assert.assertFalse(pathAdded.get());
         }
         finally
         {
@@ -359,7 +354,7 @@ public class TestFailedDeleteManager extends BaseClassForTests
             backgroundLatch.await();
             
             //Exception is expected, the delete should not be retried
-            assertFalse(pathAdded.get());
+            Assert.assertFalse(pathAdded.get());
         }
         finally
         {

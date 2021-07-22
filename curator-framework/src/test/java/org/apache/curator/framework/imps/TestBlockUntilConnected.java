@@ -19,10 +19,6 @@
 
 package org.apache.curator.framework.imps;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.state.ConnectionState;
@@ -32,8 +28,8 @@ import org.apache.curator.test.BaseClassForTests;
 import org.apache.curator.test.TestingServer;
 import org.apache.curator.test.Timing;
 import org.apache.curator.utils.CloseableUtils;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
@@ -70,12 +66,12 @@ public class TestBlockUntilConnected extends BaseClassForTests
 
             client.start();
 
-            assertTrue(timing.awaitLatch(connectedLatch), "Timed out awaiting latch");
-            assertTrue(client.blockUntilConnected(1, TimeUnit.SECONDS), "Not connected");
+            Assert.assertTrue(timing.awaitLatch(connectedLatch), "Timed out awaiting latch");
+            Assert.assertTrue(client.blockUntilConnected(1, TimeUnit.SECONDS), "Not connected");
         }
         catch ( InterruptedException e )
         {
-            fail("Unexpected interruption");
+            Assert.fail("Unexpected interruption");
         }
         finally
         {
@@ -97,11 +93,11 @@ public class TestBlockUntilConnected extends BaseClassForTests
         try
         {
             client.start();
-            assertTrue(client.blockUntilConnected(5, TimeUnit.SECONDS), "Not connected");
+            Assert.assertTrue(client.blockUntilConnected(5, TimeUnit.SECONDS), "Not connected");
         }
         catch ( InterruptedException e )
         {
-            fail("Unexpected interruption");
+            Assert.fail("Unexpected interruption");
         }
         finally
         {
@@ -141,21 +137,21 @@ public class TestBlockUntilConnected extends BaseClassForTests
             client.start();
 
             //Block until we're connected
-            assertTrue(client.blockUntilConnected(5, TimeUnit.SECONDS), "Failed to connect");
+            Assert.assertTrue(client.blockUntilConnected(5, TimeUnit.SECONDS), "Failed to connect");
 
             //Kill the server
             CloseableUtils.closeQuietly(server);
 
             //Wait until we hit the lost state
-            assertTrue(timing.awaitLatch(lostLatch), "Failed to reach LOST state");
+            Assert.assertTrue(timing.awaitLatch(lostLatch), "Failed to reach LOST state");
 
             server = new TestingServer(server.getPort(), server.getTempDirectory());
 
-            assertTrue(client.blockUntilConnected(5, TimeUnit.SECONDS), "Not connected");
+            Assert.assertTrue(client.blockUntilConnected(5, TimeUnit.SECONDS), "Not connected");
         }
         catch ( Exception e )
         {
-            fail("Unexpected exception " + e);
+            Assert.fail("Unexpected exception " + e);
         }
         finally
         {
@@ -181,11 +177,11 @@ public class TestBlockUntilConnected extends BaseClassForTests
         try
         {
             client.start();
-            assertFalse(client.blockUntilConnected(5, TimeUnit.SECONDS), "Connected");
+            Assert.assertFalse(client.blockUntilConnected(5, TimeUnit.SECONDS), "Connected");
         }
         catch ( InterruptedException e )
         {
-            fail("Unexpected interruption");
+            Assert.fail("Unexpected interruption");
         }
         finally
         {
@@ -226,7 +222,7 @@ public class TestBlockUntilConnected extends BaseClassForTests
             }, 3000);
 
             client.blockUntilConnected(5, TimeUnit.SECONDS);
-            fail("Expected interruption did not occur");
+            Assert.fail("Expected interruption did not occur");
         }
         catch ( InterruptedException e )
         {
@@ -253,7 +249,7 @@ public class TestBlockUntilConnected extends BaseClassForTests
                 client.start();
                 client.blockUntilConnected();
 
-                assertTrue(client.getZookeeperClient().isConnected(), "Not connected after blocking for connection #" + i);
+                Assert.assertTrue(client.getZookeeperClient().isConnected(), "Not connected after blocking for connection #" + i);
             }
             finally
             {

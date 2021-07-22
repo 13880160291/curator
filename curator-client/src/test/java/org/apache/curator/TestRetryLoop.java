@@ -18,9 +18,6 @@
  */
 package org.apache.curator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.retry.RetryForever;
 import org.apache.curator.retry.RetryOneTime;
@@ -29,8 +26,9 @@ import org.apache.curator.test.Timing;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooDefs;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import java.util.concurrent.TimeUnit;
 
@@ -46,7 +44,7 @@ public class TestRetryLoop extends BaseClassForTests
             @Override
             public void sleepFor(long time, TimeUnit unit) throws InterruptedException
             {
-                assertTrue(unit.toMillis(time) <= 100);
+                Assert.assertTrue(unit.toMillis(time) <= 100);
             }
         };
         ExponentialBackoffRetry         retry = new ExponentialBackoffRetry(1, Integer.MAX_VALUE, 100);
@@ -91,7 +89,7 @@ public class TestRetryLoop extends BaseClassForTests
 
                     default:
                     {
-                        fail();
+                        Assert.fail();
                         break outer;
                     }
                 }
@@ -108,7 +106,7 @@ public class TestRetryLoop extends BaseClassForTests
                 }
             }
 
-            assertTrue(loopCount >= 2);
+            Assert.assertTrue(loopCount >= 2);
         }
         finally
         {
@@ -129,7 +127,7 @@ public class TestRetryLoop extends BaseClassForTests
             {
                 if ( ++loopCount > 2 )
                 {
-                    fail();
+                    Assert.fail();
                     break;
                 }
 
@@ -144,7 +142,7 @@ public class TestRetryLoop extends BaseClassForTests
                 }
             }
 
-            assertTrue(loopCount > 0);
+            Assert.assertTrue(loopCount > 0);
         }
         finally
         {
@@ -162,7 +160,7 @@ public class TestRetryLoop extends BaseClassForTests
         for (int i = 0; i < 10; i++)
         {
             boolean allowed = retryForever.allowRetry(i, 0, sleeper);
-            assertTrue(allowed);
+            Assert.assertTrue(allowed);
             Mockito.verify(sleeper, times(i + 1)).sleepFor(retryIntervalMs, TimeUnit.MILLISECONDS);
         }
     }
@@ -198,14 +196,14 @@ public class TestRetryLoop extends BaseClassForTests
                 }
             }
 
-            fail("Should failed with SessionExpiredException.");
+            Assert.fail("Should failed with SessionExpiredException.");
         }
         catch ( Exception e )
         {
             if ( e instanceof KeeperException )
             {
                 int rc = ((KeeperException) e).code().intValue();
-                assertEquals(rc, KeeperException.Code.SESSIONEXPIRED.intValue());
+                Assert.assertEquals(rc, KeeperException.Code.SESSIONEXPIRED.intValue());
             }
             else
             {

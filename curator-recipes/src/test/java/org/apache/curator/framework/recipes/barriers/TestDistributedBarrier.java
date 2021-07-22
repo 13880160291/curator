@@ -18,8 +18,6 @@
  */
 package org.apache.curator.framework.recipes.barriers;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import com.google.common.collect.Lists;
 import org.apache.curator.test.BaseClassForTests;
 import org.apache.curator.utils.CloseableUtils;
@@ -27,8 +25,8 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryOneTime;
 import org.apache.zookeeper.KeeperException;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -68,7 +66,7 @@ public class TestDistributedBarrier extends BaseClassForTests
 
             barrier.waitOnBarrier(TIMEOUT * 2, TimeUnit.SECONDS);
             future.get();
-            fail();
+            Assert.fail();
         }
         catch ( KeeperException.ConnectionLossException expected )
         {
@@ -161,7 +159,7 @@ public class TestDistributedBarrier extends BaseClassForTests
             client.start();
 
             final DistributedBarrier      barrier = new DistributedBarrier(client, "/barrier");
-            assertTrue(barrier.waitOnBarrier(10, TimeUnit.SECONDS));
+            Assert.assertTrue(barrier.waitOnBarrier(10, TimeUnit.SECONDS));
 
             // just for grins, test the infinite wait
             ExecutorService         service = Executors.newSingleThreadExecutor();
@@ -177,7 +175,7 @@ public class TestDistributedBarrier extends BaseClassForTests
                     }
                 }
             );
-            assertTrue(future.get(10, TimeUnit.SECONDS) != null);
+            Assert.assertTrue(future.get(10, TimeUnit.SECONDS) != null);
         }
         finally
         {
@@ -211,7 +209,7 @@ public class TestDistributedBarrier extends BaseClassForTests
                 }
             );
 
-            assertTrue(barrier.waitOnBarrier(10, TimeUnit.SECONDS));
+            Assert.assertTrue(barrier.waitOnBarrier(10, TimeUnit.SECONDS));
         }
         finally
         {

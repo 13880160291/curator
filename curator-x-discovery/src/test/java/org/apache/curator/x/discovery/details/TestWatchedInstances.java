@@ -18,8 +18,6 @@
  */
 package org.apache.curator.x.discovery.details;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import com.google.common.collect.Lists;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -30,8 +28,8 @@ import org.apache.curator.utils.CloseableUtils;
 import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
 import org.apache.curator.x.discovery.ServiceInstance;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.io.Closeable;
 import java.util.Arrays;
 import java.util.Collections;
@@ -61,11 +59,11 @@ public class TestWatchedInstances extends BaseClassForTests
             closeables.add(discovery);
             discovery.start();
 
-            assertEquals(discovery.queryForNames(), Arrays.asList("test"));
+            Assert.assertEquals(discovery.queryForNames(), Arrays.asList("test"));
 
             List<ServiceInstance<String>> list = Lists.newArrayList();
             list.add(instance);
-            assertEquals(discovery.queryForInstances("test"), list);
+            Assert.assertEquals(discovery.queryForInstances("test"), list);
 
             ServiceDiscoveryImpl<String> discoveryImpl = (ServiceDiscoveryImpl<String>)discovery;
             ServiceInstance<String> changedInstance = ServiceInstance.<String>builder()
@@ -81,8 +79,8 @@ public class TestWatchedInstances extends BaseClassForTests
             timing.sleepABit();
 
             ServiceInstance<String> registeredService = discoveryImpl.getRegisteredService(instance.getId());
-            assertNotNull(registeredService);
-            assertEquals(registeredService.getPayload(), "different");
+            Assert.assertNotNull(registeredService);
+            Assert.assertEquals(registeredService.getPayload(), "different");
         }
         finally
         {

@@ -28,7 +28,7 @@
 
     <groupId>org.apache.curator</groupId>
     <artifactId>apache-curator</artifactId>
-    <version>5.1.1-SNAPSHOT</version>
+    <version>5.1.0</version>
     <packaging>pom</packaging>
 
     <name>Apache Curator</name>
@@ -52,13 +52,6 @@
     </organization>
 
     <properties>
-        <!-- maven properties -->
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <dependency.locations.enabled>false</dependency.locations.enabled>
-
-        <currentStableVersion>5.1.0</currentStableVersion>
-
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -66,11 +59,9 @@
         <short-jdk-version>8</short-jdk-version>
         <jdk-version>1.${short-jdk-version}</jdk-version>
 
-        <redirectTestOutputToFile>true</redirectTestOutputToFile>
-
         <!-- versions -->
-        <zookeeper-version>3.6.3</zookeeper-version>
-        <maven-bundle-plugin-version>5.1.1</maven-bundle-plugin-version>
+        <zookeeper-version>3.6.0</zookeeper-version>
+        <maven-bundle-plugin-version>4.1.0</maven-bundle-plugin-version>
         <maven-javadoc-plugin-version>3.0.1</maven-javadoc-plugin-version>
         <doxia-module-confluence-version>1.8</doxia-module-confluence-version>
         <maven-license-plugin-version>1.9.0</maven-license-plugin-version>
@@ -92,7 +83,7 @@
         <guava-version>27.0.1-jre</guava-version>
         <guava-listenablefuture-version>1.0</guava-listenablefuture-version>
         <guava-failureaccess-version>1.0.1</guava-failureaccess-version>
-        <junit-version>5.6.2</junit-version>
+        <testng-version>6.14.3</testng-version>
         <swift-version>0.23.1</swift-version>
         <maven-shade-plugin-version>3.2.1</maven-shade-plugin-version>
         <slf4j-version>1.7.25</slf4j-version>
@@ -100,7 +91,6 @@
         <dropwizard-version>3.2.5</dropwizard-version>
         <snappy-version>1.1.7</snappy-version>
         <build-helper-maven-plugin-version>3.1.0</build-helper-maven-plugin-version>
-        <awaitility-version>4.1.0</awaitility-version>
 
         <!-- OSGi Properties -->
         <osgi.export.package />
@@ -117,7 +107,7 @@
         <connection>scm:git:https://gitbox.apache.org/repos/asf/curator.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/curator.git
         </developerConnection>
-        <tag>apache-curator-3.2.0</tag>
+        <tag>apache.curator-5.1.0</tag>
     </scm>
 
     <issueManagement>
@@ -181,7 +171,7 @@
             <timezone>-5</timezone>
             <roles>
                 <role>Committer</role>
-                <role>PMC Member</role>
+                <role>PMC Chair</role>
             </roles>
             <url>https://people.apache.org/~randgalt</url>
         </developer>
@@ -327,21 +317,9 @@
             <timezone>+1</timezone>
             <roles>
                 <role>Committer</role>
-                <role>PMC Chair</role>
-            </roles>
-            <url>https://people.apache.org/~eolivelli</url>
-        </developer>
-
-        <developer>
-            <id>tison</id>
-            <name>Zili Chen</name>
-            <email>tison@apache.org</email>
-            <timezone>+8</timezone>
-            <roles>
-                <role>Committer</role>
                 <role>PMC Member</role>
             </roles>
-            <url>https://github.com/tisonkun/</url>
+            <url>https://people.apache.org/~eolivelli</url>
         </developer>
     </developers>
 
@@ -576,15 +554,9 @@
             </dependency>
 
             <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-api</artifactId>
-                <version>${junit-version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-engine</artifactId>
-                <version>${junit-version}</version>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>${testng-version}</version>
             </dependency>
 
             <dependency>
@@ -628,14 +600,6 @@
                 <artifactId>snappy-java</artifactId>
                 <version>${snappy-version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>org.awaitility</groupId>
-                <artifactId>awaitility</artifactId>
-                <version>${awaitility-version}</version>
-                <scope>test</scope>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -680,12 +644,6 @@
                 </plugin>
 
                 <plugin>
-                    <groupId>org.commonjava.maven.plugins</groupId>
-                    <artifactId>directory-maven-plugin</artifactId>
-                    <version>0.1</version>
-                </plugin>
-
-                <plugin>
                     <groupId>com.mycila.maven-license-plugin</groupId>
                     <artifactId>maven-license-plugin</artifactId>
                     <version>${maven-license-plugin-version}</version>
@@ -718,12 +676,6 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>${build-helper-maven-plugin-version}</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -779,12 +731,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version>
                 <configuration>
                     <threadCount>1</threadCount>
                     <reuseForks>false</reuseForks>
-                    <redirectTestOutputToFile>${redirectTestOutputToFile}</redirectTestOutputToFile>
-                    <rerunFailingTestsCount>2</rerunFailingTestsCount>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
                 </configuration>
             </plugin>
 
@@ -843,34 +793,13 @@
                 </executions>
             </plugin>
 
-            <!-- Directory plugin to find parent root directory absolute path -->
-            <plugin>
-                <groupId>org.commonjava.maven.plugins</groupId>
-                <artifactId>directory-maven-plugin</artifactId>
-                <version>0.1</version>
-                <executions>
-                    <execution>
-                        <id>directories</id>
-                        <goals>
-                            <goal>highest-basedir</goal>
-                        </goals>
-                        <phase>validate</phase>
-                        <configuration>
-                            <property>main.basedir</property>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
                 <configuration>
-                    <header>${main.basedir}/src/etc/header.txt</header>
+                    <header>src/etc/header.txt</header>
                     <excludes>
-                        <exclude>**/merge-pr.py</exclude>
                         <exclude>**/*.confluence</exclude>
-                        <exclude>**/*.confluence.vm</exclude>
                         <exclude>**/help.txt</exclude>
                         <exclude>**/*.rdf</exclude>
                         <exclude>**/.gitignore</exclude>
@@ -1051,12 +980,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.1</version>
             </plugin>
         </plugins>
     </build>

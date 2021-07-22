@@ -19,11 +19,6 @@
 
 package org.apache.curator.framework.recipes.locks;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import com.google.common.collect.Lists;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -37,8 +32,8 @@ import org.apache.curator.test.compatibility.Timing2;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.curator.utils.ZKPaths;
 import org.apache.zookeeper.KeeperException;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -72,9 +67,9 @@ public abstract class TestInterProcessMutexBase extends BaseClassForTests
             InterProcessLock lock = makeLock(client);
             try ( Locker locker = new Locker(lock, timing.milliseconds(), TimeUnit.MILLISECONDS) )
             {
-                assertTrue(lock.isAcquiredInThisProcess());
+                Assert.assertTrue(lock.isAcquiredInThisProcess());
             }
-            assertFalse(lock.isAcquiredInThisProcess());
+            Assert.assertFalse(lock.isAcquiredInThisProcess());
         }
         finally
         {
@@ -126,7 +121,7 @@ public abstract class TestInterProcessMutexBase extends BaseClassForTests
                                     timing.sleepABit();
 
                                     server.stop();
-                                    assertTrue(timing.forWaiting().awaitLatch(latch));
+                                    Assert.assertTrue(timing.forWaiting().awaitLatch(latch));
                                     server.restart();
                                 }
                             }
@@ -149,7 +144,7 @@ public abstract class TestInterProcessMutexBase extends BaseClassForTests
 
             for ( int i = 0; i < 2; ++i )
             {
-                assertEquals(service.take().get(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS), result);
+                Assert.assertEquals(service.take().get(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS), result);
             }
         }
         finally
@@ -202,9 +197,9 @@ public abstract class TestInterProcessMutexBase extends BaseClassForTests
                     }
                 );
 
-            assertTrue(timing.acquireSemaphore(semaphore, 1));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore, 1));
             client.getZookeeperClient().getZooKeeper().getTestable().injectSessionExpiration();
-            assertTrue(timing.forSessionSleep().acquireSemaphore(semaphore, 1));
+            Assert.assertTrue(timing.forSessionSleep().acquireSemaphore(semaphore, 1));
         }
         finally
         {
@@ -271,7 +266,7 @@ public abstract class TestInterProcessMutexBase extends BaseClassForTests
 
                 new Timing().sleepABit();
 
-                assertNull(client.checkExists().forPath(LOCK_BASE_PATH));
+                Assert.assertNull(client.checkExists().forPath(LOCK_BASE_PATH));
             }
             finally
             {
@@ -339,7 +334,7 @@ public abstract class TestInterProcessMutexBase extends BaseClassForTests
                                 mutex.acquire();
                                 try
                                 {
-                                    assertTrue(hasLock.compareAndSet(false, true));
+                                    Assert.assertTrue(hasLock.compareAndSet(false, true));
                                     if ( isFirst.compareAndSet(true, false) )
                                     {
                                         semaphore.release(THREAD_QTY - 1);
@@ -394,11 +389,11 @@ public abstract class TestInterProcessMutexBase extends BaseClassForTests
                         @Override
                         public Object call() throws Exception
                         {
-                            assertTrue(countLatchForBar.await(10, TimeUnit.SECONDS));
+                            Assert.assertTrue(countLatchForBar.await(10, TimeUnit.SECONDS));
                             try
                             {
                                 mutex.acquire(10, TimeUnit.SECONDS);
-                                fail();
+                                Assert.fail();
                             }
                             catch ( Exception e )
                             {
@@ -414,7 +409,7 @@ public abstract class TestInterProcessMutexBase extends BaseClassForTests
                 );
 
             foo(mutex);
-            assertFalse(mutex.isAcquiredInThisProcess());
+            Assert.assertFalse(mutex.isAcquiredInThisProcess());
         }
         finally
         {
@@ -431,7 +426,7 @@ public abstract class TestInterProcessMutexBase extends BaseClassForTests
         {
             InterProcessLock mutex = makeLock(client);
             foo(mutex);
-            assertFalse(mutex.isAcquiredInThisProcess());
+            Assert.assertFalse(mutex.isAcquiredInThisProcess());
         }
         finally
         {
@@ -442,32 +437,32 @@ public abstract class TestInterProcessMutexBase extends BaseClassForTests
     private void foo(InterProcessLock mutex) throws Exception
     {
         mutex.acquire(10, TimeUnit.SECONDS);
-        assertTrue(mutex.isAcquiredInThisProcess());
+        Assert.assertTrue(mutex.isAcquiredInThisProcess());
         bar(mutex);
-        assertTrue(mutex.isAcquiredInThisProcess());
+        Assert.assertTrue(mutex.isAcquiredInThisProcess());
         mutex.release();
     }
 
     private void bar(InterProcessLock mutex) throws Exception
     {
         mutex.acquire(10, TimeUnit.SECONDS);
-        assertTrue(mutex.isAcquiredInThisProcess());
+        Assert.assertTrue(mutex.isAcquiredInThisProcess());
         if ( countLatchForBar != null )
         {
             countLatchForBar.countDown();
             waitLatchForBar.await(10, TimeUnit.SECONDS);
         }
         snafu(mutex);
-        assertTrue(mutex.isAcquiredInThisProcess());
+        Assert.assertTrue(mutex.isAcquiredInThisProcess());
         mutex.release();
     }
 
     private void snafu(InterProcessLock mutex) throws Exception
     {
         mutex.acquire(10, TimeUnit.SECONDS);
-        assertTrue(mutex.isAcquiredInThisProcess());
+        Assert.assertTrue(mutex.isAcquiredInThisProcess());
         mutex.release();
-        assertTrue(mutex.isAcquiredInThisProcess());
+        Assert.assertTrue(mutex.isAcquiredInThisProcess());
     }
 
     @Test
@@ -541,13 +536,13 @@ public abstract class TestInterProcessMutexBase extends BaseClassForTests
             while ( !mutexForClient1.isAcquiredInThisProcess() && !mutexForClient2.isAcquiredInThisProcess() )
             {
                 Thread.sleep(1000);
-                assertFalse(future1.isDone() && future2.isDone());
+                Assert.assertFalse(future1.isDone() && future2.isDone());
             }
 
-            assertTrue(mutexForClient1.isAcquiredInThisProcess() != mutexForClient2.isAcquiredInThisProcess());
+            Assert.assertTrue(mutexForClient1.isAcquiredInThisProcess() != mutexForClient2.isAcquiredInThisProcess());
             Thread.sleep(1000);
-            assertTrue(mutexForClient1.isAcquiredInThisProcess() || mutexForClient2.isAcquiredInThisProcess());
-            assertTrue(mutexForClient1.isAcquiredInThisProcess() != mutexForClient2.isAcquiredInThisProcess());
+            Assert.assertTrue(mutexForClient1.isAcquiredInThisProcess() || mutexForClient2.isAcquiredInThisProcess());
+            Assert.assertTrue(mutexForClient1.isAcquiredInThisProcess() != mutexForClient2.isAcquiredInThisProcess());
 
             Exception exception = exceptionRef.get();
             if ( exception != null )
@@ -558,14 +553,14 @@ public abstract class TestInterProcessMutexBase extends BaseClassForTests
             if ( mutexForClient1.isAcquiredInThisProcess() )
             {
                 latchForClient1.countDown();
-                assertTrue(acquiredLatchForClient2.await(10, TimeUnit.SECONDS));
-                assertTrue(mutexForClient2.isAcquiredInThisProcess());
+                Assert.assertTrue(acquiredLatchForClient2.await(10, TimeUnit.SECONDS));
+                Assert.assertTrue(mutexForClient2.isAcquiredInThisProcess());
             }
             else
             {
                 latchForClient2.countDown();
-                assertTrue(acquiredLatchForClient1.await(10, TimeUnit.SECONDS));
-                assertTrue(mutexForClient1.isAcquiredInThisProcess());
+                Assert.assertTrue(acquiredLatchForClient1.await(10, TimeUnit.SECONDS));
+                Assert.assertTrue(mutexForClient1.isAcquiredInThisProcess());
             }
 
             future1.get();

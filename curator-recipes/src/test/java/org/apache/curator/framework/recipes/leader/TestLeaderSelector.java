@@ -19,12 +19,6 @@
 
 package org.apache.curator.framework.recipes.leader;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
@@ -40,8 +34,8 @@ import org.apache.curator.test.TestingServer;
 import org.apache.curator.test.Timing;
 import org.apache.curator.test.compatibility.Timing2;
 import org.apache.curator.utils.CloseableUtils;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -52,6 +46,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.testng.Assert.fail;
 
 public class TestLeaderSelector extends BaseClassForTests
 {
@@ -90,9 +86,9 @@ public class TestLeaderSelector extends BaseClassForTests
             selector.start();
             Thread leaderThread = timing.takeFromQueue(threadExchange);
             leaderThread.interrupt();
-            assertTrue(timing.awaitLatch(exitLatch));
+            Assert.assertTrue(timing.awaitLatch(exitLatch));
             timing.sleepABit(); // wait for leader selector to clear nodes
-            assertEquals(0, selector.failedMutexReleaseCount.get());
+            Assert.assertEquals(0, selector.failedMutexReleaseCount.get());
         }
         finally
         {
@@ -148,14 +144,14 @@ public class TestLeaderSelector extends BaseClassForTests
             selector = new LeaderSelector(client, "/test", listener);
             selector.start();
 
-            assertEquals(changes.poll(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS), ConnectionState.CONNECTED.name());
-            assertEquals(changes.poll(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS), "leader");
+            Assert.assertEquals(changes.poll(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS), ConnectionState.CONNECTED.name());
+            Assert.assertEquals(changes.poll(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS), "leader");
             server.close();
             List<String> next = Lists.newArrayList();
             next.add(changes.poll(timing.forSessionSleep().milliseconds(), TimeUnit.MILLISECONDS));
             next.add(changes.poll(timing.forSessionSleep().milliseconds(), TimeUnit.MILLISECONDS));
-            assertTrue(next.equals(Arrays.asList(ConnectionState.SUSPENDED.name(), "release")) || next.equals(Arrays.asList("release", ConnectionState.SUSPENDED.name())), next.toString());
-            assertEquals(changes.poll(timing.forSessionSleep().milliseconds(), TimeUnit.MILLISECONDS), ConnectionState.LOST.name());
+            Assert.assertTrue(next.equals(Arrays.asList(ConnectionState.SUSPENDED.name(), "release")) || next.equals(Arrays.asList("release", ConnectionState.SUSPENDED.name())), next.toString());
+            Assert.assertEquals(changes.poll(timing.forSessionSleep().milliseconds(), TimeUnit.MILLISECONDS), ConnectionState.LOST.name());
 
             selector.close();
             client.close();
@@ -176,14 +172,14 @@ public class TestLeaderSelector extends BaseClassForTests
             selector = new LeaderSelector(client, "/test", listener);
             selector.start();
 
-            assertEquals(changes.poll(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS), ConnectionState.CONNECTED.name());
-            assertEquals(changes.poll(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS), "leader");
+            Assert.assertEquals(changes.poll(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS), ConnectionState.CONNECTED.name());
+            Assert.assertEquals(changes.poll(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS), "leader");
             server.stop();
-            assertEquals(changes.poll(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS), ConnectionState.SUSPENDED.name());
+            Assert.assertEquals(changes.poll(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS), ConnectionState.SUSPENDED.name());
             next = Lists.newArrayList();
             next.add(changes.poll(timing.forSessionSleep().milliseconds(), TimeUnit.MILLISECONDS));
             next.add(changes.poll(timing.forSessionSleep().milliseconds(), TimeUnit.MILLISECONDS));
-            assertTrue(next.equals(Arrays.asList(ConnectionState.LOST.name(), "release")) || next.equals(Arrays.asList("release", ConnectionState.LOST.name())), next.toString());
+            Assert.assertTrue(next.equals(Arrays.asList(ConnectionState.LOST.name(), "release")) || next.equals(Arrays.asList("release", ConnectionState.LOST.name())), next.toString());
         }
         finally
         {
@@ -245,10 +241,10 @@ public class TestLeaderSelector extends BaseClassForTests
             server.stop();
             leaderThread.interrupt();
             server.restart();
-            assertTrue(timing.awaitLatch(reconnectedLatch));
+            Assert.assertTrue(timing.awaitLatch(reconnectedLatch));
             timing.sleepABit();
 
-            assertEquals(client.getChildren().forPath("/leader").size(), 0);
+            Assert.assertEquals(client.getChildren().forPath("/leader").size(), 0);
         }
         finally
         {
@@ -282,10 +278,10 @@ public class TestLeaderSelector extends BaseClassForTests
             selector.autoRequeue();
             selector.start();
 
-            assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
             selector.interruptLeadership();
 
-            assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
         }
         finally
         {
@@ -331,9 +327,9 @@ public class TestLeaderSelector extends BaseClassForTests
             selector = new LeaderSelector(client, "/leader", listener);
             selector.start();
 
-            assertTrue(timing.awaitLatch(isLeaderLatch));
+            Assert.assertTrue(timing.awaitLatch(isLeaderLatch));
             selector.interruptLeadership();
-            assertTrue(timing.awaitLatch(losingLeaderLatch));
+            Assert.assertTrue(timing.awaitLatch(losingLeaderLatch));
         }
         finally
         {
@@ -386,16 +382,16 @@ public class TestLeaderSelector extends BaseClassForTests
 
             selector.start();
 
-            assertTrue(timing.awaitLatch(debugLeadershipLatch));
+            Assert.assertTrue(timing.awaitLatch(debugLeadershipLatch));
             server.stop();
-            assertTrue(timing.awaitLatch(lostLatch));
+            Assert.assertTrue(timing.awaitLatch(lostLatch));
             timing.sleepABit();
             debugLeadershipWaitLatch.countDown();
 
             server.restart();
-            assertTrue(timing.awaitLatch(reconnectedLatch));
+            Assert.assertTrue(timing.awaitLatch(reconnectedLatch));
 
-            assertFalse(takeLeadershipLatch.await(3, TimeUnit.SECONDS));
+            Assert.assertFalse(takeLeadershipLatch.await(3, TimeUnit.SECONDS));
         }
         finally
         {
@@ -433,7 +429,7 @@ public class TestLeaderSelector extends BaseClassForTests
             selector.autoRequeue();
             selector.start();
 
-            assertTrue(timing.acquireSemaphore(semaphore, 2));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore, 2));
         }
         finally
         {
@@ -532,20 +528,20 @@ public class TestLeaderSelector extends BaseClassForTests
             leaderSelector1.start();
             leaderSelector2.start();
 
-            assertTrue(timing.acquireSemaphore(semaphore, 1));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore, 1));
 
             client.getZookeeperClient().getZooKeeper().getTestable().injectSessionExpiration();
 
-            assertTrue(timing.awaitLatch(interruptedLatch));
+            Assert.assertTrue(timing.awaitLatch(interruptedLatch));
             timing.sleepABit();
 
             boolean requeued1 = leaderSelector1.requeue();
             boolean requeued2 = leaderSelector2.requeue();
-            assertTrue(requeued1);
-            assertTrue(requeued2);
+            Assert.assertTrue(requeued1);
+            Assert.assertTrue(requeued2);
 
-            assertTrue(timing.acquireSemaphore(semaphore, 1));
-            assertEquals(leaderCount.get(), 1);
+            Assert.assertTrue(timing.acquireSemaphore(semaphore, 1));
+            Assert.assertEquals(leaderCount.get(), 1);
 
             if ( leaderSelector1.hasLeadership() )
             {
@@ -563,8 +559,8 @@ public class TestLeaderSelector extends BaseClassForTests
             }
 
             // Verify that the other leader took over leadership.
-            assertTrue(timing.acquireSemaphore(semaphore, 1));
-            assertEquals(leaderCount.get(), 1);
+            Assert.assertTrue(timing.acquireSemaphore(semaphore, 1));
+            Assert.assertEquals(leaderCount.get(), 1);
 
             if ( !leaderSelector1Closed )
             {
@@ -636,17 +632,17 @@ public class TestLeaderSelector extends BaseClassForTests
             leaderSelector1.start();
             leaderSelector2.start();
 
-            assertTrue(timing.acquireSemaphore(semaphore, 1));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore, 1));
 
             int port = server.getPort();
             server.stop();
             timing.sleepABit();
             server = new TestingServer(port);
-            assertTrue(timing.awaitLatch(interruptedLatch));
+            Assert.assertTrue(timing.awaitLatch(interruptedLatch));
             timing.sleepABit();
 
-            assertTrue(timing.acquireSemaphore(semaphore, 1));
-            assertEquals(leaderCount.get(), 1);
+            Assert.assertTrue(timing.acquireSemaphore(semaphore, 1));
+            Assert.assertEquals(leaderCount.get(), 1);
 
             if ( leaderSelector1.hasLeadership() )
             {
@@ -664,8 +660,8 @@ public class TestLeaderSelector extends BaseClassForTests
             }
 
             // Verify that the other leader took over leadership.
-            assertTrue(timing.acquireSemaphore(semaphore, 1));
-            assertEquals(leaderCount.get(), 1);
+            Assert.assertTrue(timing.acquireSemaphore(semaphore, 1));
+            Assert.assertEquals(leaderCount.get(), 1);
 
             if ( !leaderSelector1Closed )
             {
@@ -726,7 +722,7 @@ public class TestLeaderSelector extends BaseClassForTests
                 Thread.sleep(1000);
             }
 
-            assertNotSame(leaderSelector1.hasLeadership(), leaderSelector2.hasLeadership());
+            Assert.assertNotSame(leaderSelector1.hasLeadership(), leaderSelector2.hasLeadership());
 
             LeaderSelector positiveLeader;
             LeaderSelector negativeLeader;
@@ -743,12 +739,12 @@ public class TestLeaderSelector extends BaseClassForTests
 
             negativeLeader.close();
             Thread.sleep(1000);
-            assertNotSame(positiveLeader.hasLeadership(), negativeLeader.hasLeadership());
-            assertTrue(positiveLeader.hasLeadership());
+            Assert.assertNotSame(positiveLeader.hasLeadership(), negativeLeader.hasLeadership());
+            Assert.assertTrue(positiveLeader.hasLeadership());
 
             positiveLeader.close();
             Thread.sleep(1000);
-            assertFalse(positiveLeader.hasLeadership());
+            Assert.assertFalse(positiveLeader.hasLeadership());
         }
         finally
         {
@@ -808,7 +804,7 @@ public class TestLeaderSelector extends BaseClassForTests
                 while ( localLeaderList.size() != (i * selectors.size()) )
                 {
                     Integer polledIndex = leaderList.poll(10, TimeUnit.SECONDS);
-                    assertNotNull(polledIndex);
+                    Assert.assertNotNull(polledIndex);
                     localLeaderList.add(polledIndex);
                 }
                 timing.sleepABit();
@@ -825,10 +821,10 @@ public class TestLeaderSelector extends BaseClassForTests
                 Set<Integer> uniques = Sets.newHashSet();
                 for ( int j = 0; j < selectors.size(); ++j )
                 {
-                    assertTrue(localLeaderList.size() > 0);
+                    Assert.assertTrue(localLeaderList.size() > 0);
 
                     int thisIndex = localLeaderList.remove(0);
-                    assertFalse(uniques.contains(thisIndex));
+                    Assert.assertFalse(uniques.contains(thisIndex));
                     uniques.add(thisIndex);
                 }
             }

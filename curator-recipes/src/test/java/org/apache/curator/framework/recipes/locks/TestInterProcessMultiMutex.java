@@ -18,16 +18,12 @@
  */
 package org.apache.curator.framework.recipes.locks;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.imps.TestCleanState;
 import org.apache.curator.retry.RetryOneTime;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -85,14 +81,14 @@ public class TestInterProcessMultiMutex extends TestInterProcessMutexBase
             {
                 lock.acquire();
                 lock.release();
-                fail();
+                Assert.fail();
             }
             catch ( Exception e )
             {
                 // ignore
             }
-            assertFalse(goodLock.isAcquiredInThisProcess());
-            assertTrue(otherGoodLock.isAcquiredInThisProcess());
+            Assert.assertFalse(goodLock.isAcquiredInThisProcess());
+            Assert.assertTrue(otherGoodLock.isAcquiredInThisProcess());
         }
         finally
         {
@@ -144,14 +140,14 @@ public class TestInterProcessMultiMutex extends TestInterProcessMutexBase
             try
             {
                 lock.acquire();
-                fail();
+                Assert.fail();
             }
             catch ( Exception e )
             {
                 // ignore
             }
-            assertFalse(goodLock.isAcquiredInThisProcess());
-            assertTrue(goodLockWasLocked.get());
+            Assert.assertFalse(goodLock.isAcquiredInThisProcess());
+            Assert.assertTrue(goodLockWasLocked.get());
         }
         finally
         {

@@ -19,15 +19,13 @@
 
 package org.apache.curator.framework.recipes.cache;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryOneTime;
 import org.apache.curator.test.compatibility.CuratorTestBase;
 import org.apache.curator.utils.Compatibility;
-import org.junit.jupiter.api.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class TestCuratorCacheBridge extends CuratorTestBase
 {
@@ -39,13 +37,13 @@ public class TestCuratorCacheBridge extends CuratorTestBase
             CuratorCacheBridge cache = CuratorCache.bridgeBuilder(client, "/foo").build();
             if ( Compatibility.hasPersistentWatchers() )
             {
-                assertTrue(cache instanceof CuratorCacheImpl);
-                assertTrue(cache.isCuratorCache());
+                Assert.assertTrue(cache instanceof CuratorCacheImpl);
+                Assert.assertTrue(cache.isCuratorCache());
             }
             else
             {
-                assertTrue(cache instanceof CompatibleCuratorCacheBridge);
-                assertFalse(cache.isCuratorCache());
+                Assert.assertTrue(cache instanceof CompatibleCuratorCacheBridge);
+                Assert.assertFalse(cache.isCuratorCache());
             }
         }
     }
@@ -57,8 +55,8 @@ public class TestCuratorCacheBridge extends CuratorTestBase
         try (CuratorFramework client = CuratorFrameworkFactory.newClient(server.getConnectString(), new RetryOneTime(1)))
         {
             CuratorCacheBridge cache = CuratorCache.bridgeBuilder(client, "/foo").build();
-            assertTrue(cache instanceof CompatibleCuratorCacheBridge);
-            assertFalse(cache.isCuratorCache());
+            Assert.assertTrue(cache instanceof CompatibleCuratorCacheBridge);
+            Assert.assertFalse(cache.isCuratorCache());
         }
         finally
         {

@@ -19,9 +19,6 @@
 
 package org.apache.curator.x.discovery;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.google.common.collect.Lists;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -34,9 +31,8 @@ import org.apache.curator.test.compatibility.CuratorTestBase;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.curator.utils.Compatibility;
 import org.apache.curator.x.discovery.details.ServiceCacheListener;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.io.Closeable;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,7 +42,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-@Tag(CuratorTestBase.zk35TestCompatibilityGroup)
+@Test(groups = CuratorTestBase.zk35TestCompatibilityGroup)
 public class TestServiceCache extends BaseClassForTests
 {
     @Test
@@ -90,13 +86,13 @@ public class TestServiceCache extends BaseClassForTests
             discovery.registerService(instance2);
             discovery.registerService(instance3);
 
-            assertTrue(latch.await(10, TimeUnit.SECONDS));
+            Assert.assertTrue(latch.await(10, TimeUnit.SECONDS));
 
             ServiceCache<String> cache2 = discovery.serviceCacheBuilder().name("test").build();
             closeables.add(cache2);
             cache2.start();
 
-            assertEquals(cache2.getInstances().size(), 3);
+            Assert.assertEquals(cache2.getInstances().size(), 3);
         }
         finally
         {
@@ -135,17 +131,17 @@ public class TestServiceCache extends BaseClassForTests
             ServiceInstance<String> foundInstance = null;
             while ( foundInstance == null )
             {
-                assertTrue(count++ < 5);
+                Assert.assertTrue(count++ < 5);
                 foundInstance = serviceProvider.getInstance();
                 timing.sleepABit();
             }
-            assertEquals(foundInstance, instance);
+            Assert.assertEquals(foundInstance, instance);
 
             ServiceInstance<String> instance2 = ServiceInstance.<String>builder().address("foo").payload("thing").name("test").port(10064).build();
             discovery.registerService(instance2);
             timing.sleepABit();
             Collection<ServiceInstance<String>> allInstances = serviceProvider.getAllInstances();
-            assertEquals(allInstances.size(), 2);
+            Assert.assertEquals(allInstances.size(), 2);
         }
         finally
         {
@@ -194,10 +190,10 @@ public class TestServiceCache extends BaseClassForTests
             instance = ServiceInstance.<String>builder().payload("changed").name("test").port(10064).id(instance.getId()).build();
             discovery.updateService(instance);
 
-            assertTrue(latch.await(10, TimeUnit.SECONDS));
+            Assert.assertTrue(latch.await(10, TimeUnit.SECONDS));
 
-            assertEquals(cache.getInstances().size(), 1);
-            assertEquals(cache.getInstances().get(0).getPayload(), instance.getPayload());
+            Assert.assertEquals(cache.getInstances().size(), 1);
+            Assert.assertEquals(cache.getInstances().get(0).getPayload(), instance.getPayload());
         }
         finally
         {
@@ -246,14 +242,14 @@ public class TestServiceCache extends BaseClassForTests
             ServiceInstance<String> instance1 = ServiceInstance.<String>builder().payload("thing").name("test").port(10064).build();
             ServiceInstance<String> instance2 = ServiceInstance.<String>builder().payload("thing").name("test").port(10065).build();
             discovery.registerService(instance1);
-            assertTrue(semaphore.tryAcquire(10, TimeUnit.SECONDS));
+            Assert.assertTrue(semaphore.tryAcquire(10, TimeUnit.SECONDS));
 
             discovery.registerService(instance2);
-            assertTrue(semaphore.tryAcquire(3, TimeUnit.SECONDS));
+            Assert.assertTrue(semaphore.tryAcquire(3, TimeUnit.SECONDS));
 
             ServiceInstance<String> instance3 = ServiceInstance.<String>builder().payload("thing").name("another").port(10064).build();
             discovery.registerService(instance3);
-            assertFalse(semaphore.tryAcquire(3, TimeUnit.SECONDS));  // should not get called for a different service
+            Assert.assertFalse(semaphore.tryAcquire(3, TimeUnit.SECONDS));  // should not get called for a different service
         }
         finally
         {
@@ -285,7 +281,7 @@ public class TestServiceCache extends BaseClassForTests
             discovery.start();
 
             ExecuteCalledWatchingExecutorService exec = new ExecuteCalledWatchingExecutorService(Executors.newSingleThreadExecutor());
-            assertFalse(exec.isExecuteCalled());
+            Assert.assertFalse(exec.isExecuteCalled());
 
             ServiceCache<String> cache = discovery.serviceCacheBuilder().name("test").executorService(exec).build();
             closeables.add(cache);
@@ -309,9 +305,9 @@ public class TestServiceCache extends BaseClassForTests
 
             ServiceInstance<String> instance1 = ServiceInstance.<String>builder().payload("thing").name("test").port(10064).build();
             discovery.registerService(instance1);
-            assertTrue(semaphore.tryAcquire(10, TimeUnit.SECONDS));
+            Assert.assertTrue(semaphore.tryAcquire(10, TimeUnit.SECONDS));
 
-            assertTrue(exec.isExecuteCalled());
+            Assert.assertTrue(exec.isExecuteCalled());
         }
         finally
         {

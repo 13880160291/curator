@@ -60,7 +60,7 @@ class TestingQuorumPeerMain extends QuorumPeerMain implements ZooKeeperMainFace
     }
 
     @Override
-    public void close()
+    public void close() throws IOException
     {
         if ( (quorumPeer != null) && !isClosed )
         {

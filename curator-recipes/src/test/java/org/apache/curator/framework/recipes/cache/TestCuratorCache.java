@@ -19,23 +19,20 @@
 
 package org.apache.curator.framework.recipes.cache;
 
-import static org.apache.curator.framework.recipes.cache.CuratorCache.Options.DO_NOT_CLEAR_ON_CLOSE;
-import static org.apache.curator.framework.recipes.cache.CuratorCacheListener.builder;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryOneTime;
 import org.apache.curator.test.compatibility.CuratorTestBase;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Tag(CuratorTestBase.zk36Group)
+import static org.apache.curator.framework.recipes.cache.CuratorCache.Options.DO_NOT_CLEAR_ON_CLOSE;
+import static org.apache.curator.framework.recipes.cache.CuratorCacheListener.builder;
+
+@Test(groups = CuratorTestBase.zk36Group)
 public class TestCuratorCache extends CuratorTestBase
 {
     @Test
@@ -55,10 +52,10 @@ public class TestCuratorCache extends CuratorTestBase
                 cache.start();
 
                 client.create().forPath("/test/foo", "first".getBytes());
-                assertTrue(timing.awaitLatch(addedLatch));
+                Assert.assertTrue(timing.awaitLatch(addedLatch));
 
                 client.setData().forPath("/test/foo", "something new".getBytes());
-                assertTrue(timing.awaitLatch(updatedLatch));
+                Assert.assertTrue(timing.awaitLatch(updatedLatch));
             }
         }
     }
@@ -93,14 +90,14 @@ public class TestCuratorCache extends CuratorTestBase
                 };
                 cache.listenable().addListener(builder().forAll(listener).afterInitialized().build());
                 cache.start();
-                assertTrue(timing.awaitLatch(initializedLatch));
+                Assert.assertTrue(timing.awaitLatch(initializedLatch));
 
-                assertEquals(initializedLatch.getCount(), 0);
-                assertEquals(cache.size(), 4);
-                assertTrue(cache.get("/test").isPresent());
-                assertTrue(cache.get("/test/one").isPresent());
-                assertTrue(cache.get("/test/one/two").isPresent());
-                assertTrue(cache.get("/test/one/two/three").isPresent());
+                Assert.assertEquals(initializedLatch.getCount(), 0);
+                Assert.assertEquals(cache.size(), 4);
+                Assert.assertTrue(cache.get("/test").isPresent());
+                Assert.assertTrue(cache.get("/test/one").isPresent());
+                Assert.assertTrue(cache.get("/test/one/two").isPresent());
+                Assert.assertTrue(cache.get("/test/one/two/three").isPresent());
             }
         }
     }
@@ -124,25 +121,25 @@ public class TestCuratorCache extends CuratorTestBase
                 cache.start();
 
                 client.create().forPath("/test");
-                assertTrue(timing.acquireSemaphore(all, 1));
-                assertTrue(timing.acquireSemaphore(creates, 1));
-                assertTrue(timing.acquireSemaphore(createsAndChanges, 1));
-                assertEquals(changes.availablePermits(), 0);
-                assertEquals(deletes.availablePermits(), 0);
+                Assert.assertTrue(timing.acquireSemaphore(all, 1));
+                Assert.assertTrue(timing.acquireSemaphore(creates, 1));
+                Assert.assertTrue(timing.acquireSemaphore(createsAndChanges, 1));
+                Assert.assertEquals(changes.availablePermits(), 0);
+                Assert.assertEquals(deletes.availablePermits(), 0);
 
                 client.setData().forPath("/test", "new".getBytes());
-                assertTrue(timing.acquireSemaphore(all, 1));
-                assertTrue(timing.acquireSemaphore(changes, 1));
-                assertTrue(timing.acquireSemaphore(createsAndChanges, 1));
-                assertEquals(creates.availablePermits(), 0);
-                assertEquals(deletes.availablePermits(), 0);
+                Assert.assertTrue(timing.acquireSemaphore(all, 1));
+                Assert.assertTrue(timing.acquireSemaphore(changes, 1));
+                Assert.assertTrue(timing.acquireSemaphore(createsAndChanges, 1));
+                Assert.assertEquals(creates.availablePermits(), 0);
+                Assert.assertEquals(deletes.availablePermits(), 0);
 
                 client.delete().forPath("/test");
-                assertTrue(timing.acquireSemaphore(all, 1));
-                assertTrue(timing.acquireSemaphore(deletes, 1));
-                assertEquals(creates.availablePermits(), 0);
-                assertEquals(changes.availablePermits(), 0);
-                assertEquals(createsAndChanges.availablePermits(), 0);
+                Assert.assertTrue(timing.acquireSemaphore(all, 1));
+                Assert.assertTrue(timing.acquireSemaphore(deletes, 1));
+                Assert.assertEquals(creates.availablePermits(), 0);
+                Assert.assertEquals(changes.availablePermits(), 0);
+                Assert.assertEquals(createsAndChanges.availablePermits(), 0);
             }
         }
     }
@@ -164,7 +161,7 @@ public class TestCuratorCache extends CuratorTestBase
                 client.create().forPath("/test/bar", "bar".getBytes());
                 timing.sleepABit();
             }
-            assertEquals(storage.size(), 2);
+            Assert.assertEquals(storage.size(), 2);
 
             try ( CuratorCache cache = CuratorCache.build(client, "/test") )
             {
@@ -173,7 +170,7 @@ public class TestCuratorCache extends CuratorTestBase
 
                 timing.sleepABit();
             }
-            assertEquals(storage.size(), 0);
+            Assert.assertEquals(storage.size(), 0);
         }
     }
 }

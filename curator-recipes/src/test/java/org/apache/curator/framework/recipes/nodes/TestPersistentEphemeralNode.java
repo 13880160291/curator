@@ -18,13 +18,6 @@
  */
 package org.apache.curator.framework.recipes.nodes;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -48,10 +41,11 @@ import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -61,6 +55,8 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+
+import static org.testng.Assert.*;
 
 @SuppressWarnings("deprecation")
 public class TestPersistentEphemeralNode extends BaseClassForTests
@@ -74,7 +70,7 @@ public class TestPersistentEphemeralNode extends BaseClassForTests
 
     private final Timing2 timing = new Timing2();
 
-    @AfterEach
+    @AfterMethod
     @Override
     public void teardown() throws Exception
     {
@@ -130,14 +126,14 @@ public class TestPersistentEphemeralNode extends BaseClassForTests
                 client.getConnectionStateListenable().addListener(listener);
                 timing.sleepABit();
                 server.restart();
-                assertTrue(timing.awaitLatch(connectedLatch));
+                Assert.assertTrue(timing.awaitLatch(connectedLatch));
                 timing.sleepABit();
-                assertTrue(node.waitForInitialCreate(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS));
+                Assert.assertTrue(node.waitForInitialCreate(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS));
                 server.stop();
                 timing.sleepABit();
                 server.restart();
                 timing.sleepABit();
-                assertTrue(timing.awaitLatch(reconnectedLatch));
+                Assert.assertTrue(timing.awaitLatch(reconnectedLatch));
             }
         }
         finally
@@ -178,11 +174,11 @@ public class TestPersistentEphemeralNode extends BaseClassForTests
 
             server.restart();
 
-            assertTrue(timing.awaitLatch(connectedLatch));
+            Assert.assertTrue(timing.awaitLatch(connectedLatch));
 
             timing.sleepABit();
 
-            assertTrue(node.waitForInitialCreate(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS));
+            Assert.assertTrue(node.waitForInitialCreate(timing.forWaiting().milliseconds(), TimeUnit.MILLISECONDS));
         }
         finally
         {
@@ -191,39 +187,31 @@ public class TestPersistentEphemeralNode extends BaseClassForTests
         }
     }
 
-    @Test
-    public void testNullCurator()
+    @Test(expectedExceptions = NullPointerException.class)
+    public void testNullCurator() throws Exception
     {
-        assertThrows(NullPointerException.class, ()-> {
-            new PersistentEphemeralNode(null, PersistentEphemeralNode.Mode.EPHEMERAL, PATH, new byte[0]);
-        });
+        new PersistentEphemeralNode(null, PersistentEphemeralNode.Mode.EPHEMERAL, PATH, new byte[0]);
     }
 
-    @Test
-    public void testNullPath()
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testNullPath() throws Exception
     {
-        assertThrows(IllegalArgumentException.class, ()-> {
-            CuratorFramework curator = newCurator();
-            new PersistentEphemeralNode(curator, PersistentEphemeralNode.Mode.EPHEMERAL, null, new byte[0]);
-        });
+        CuratorFramework curator = newCurator();
+        new PersistentEphemeralNode(curator, PersistentEphemeralNode.Mode.EPHEMERAL, null, new byte[0]);
     }
 
-    @Test
-    public void testNullData()
+    @Test(expectedExceptions = NullPointerException.class)
+    public void testNullData() throws Exception
     {
-        assertThrows(NullPointerException.class, ()-> {
-            CuratorFramework curator = newCurator();
-            new PersistentEphemeralNode(curator, PersistentEphemeralNode.Mode.EPHEMERAL, PATH, null);
-        });
+        CuratorFramework curator = newCurator();
+        new PersistentEphemeralNode(curator, PersistentEphemeralNode.Mode.EPHEMERAL, PATH, null);
     }
 
-    @Test
-    public void testNullMode()
+    @Test(expectedExceptions = NullPointerException.class)
+    public void testNullMode() throws Exception
     {
-        assertThrows(NullPointerException.class, ()->{
-            CuratorFramework curator = newCurator();
-            new PersistentEphemeralNode(curator, null, PATH, new byte[0]);
-            });
+        CuratorFramework curator = newCurator();
+        new PersistentEphemeralNode(curator, null, PATH, new byte[0]);
     }
 
     @Test
@@ -248,9 +236,9 @@ public class TestPersistentEphemeralNode extends BaseClassForTests
             node = new PersistentEphemeralNode(client, mode, PATH, "a".getBytes());
             node.debugWaitMsForBackgroundBeforeClose.set(timing.forSleepingABit().milliseconds());
             node.start();
-            assertTrue(node.waitForInitialCreate(timing.forWaiting().seconds(), TimeUnit.SECONDS));
+            Assert.assertTrue(node.waitForInitialCreate(timing.forWaiting().seconds(), TimeUnit.SECONDS));
 
-            assertArrayEquals(client.getData().forPath(node.getActualPath()), "a".getBytes());
+            Assert.assertEquals(client.getData().forPath(node.getActualPath()), "a".getBytes());
 
             final Semaphore semaphore = new Semaphore(0);
             Watcher watcher = new Watcher()
@@ -263,15 +251,15 @@ public class TestPersistentEphemeralNode extends BaseClassForTests
             };
             client.checkExists().usingWatcher(watcher).forPath(node.getActualPath());
             node.setData("b".getBytes());
-            assertTrue(timing.acquireSemaphore(semaphore));
-            assertEquals(node.getActualPath(), node.getActualPath());
-            assertArrayEquals(client.getData().usingWatcher(watcher).forPath(node.getActualPath()), "b".getBytes());
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertEquals(node.getActualPath(), node.getActualPath());
+            Assert.assertEquals(client.getData().usingWatcher(watcher).forPath(node.getActualPath()), "b".getBytes());
             node.setData("c".getBytes());
-            assertTrue(timing.acquireSemaphore(semaphore));
-            assertEquals(node.getActualPath(), node.getActualPath());
-            assertArrayEquals(client.getData().usingWatcher(watcher).forPath(node.getActualPath()), "c".getBytes());
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertEquals(node.getActualPath(), node.getActualPath());
+            Assert.assertEquals(client.getData().usingWatcher(watcher).forPath(node.getActualPath()), "c".getBytes());
             node.close();
-            assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
         }
         finally
         {
@@ -407,7 +395,7 @@ public class TestPersistentEphemeralNode extends BaseClassForTests
             {
                 Trigger deletionTrigger = Trigger.deletedOrSetData();
                 Stat stat = observer.checkExists().usingWatcher(deletionTrigger).forPath(path);
-                assertNotNull(stat, "node should exist: " + path);
+                Assert.assertNotNull(stat, "node should exist: " + path);
 
                 node.debugCreateNodeLatch = new CountDownLatch(1);
                 // Kill the session, thus cleaning up the node...

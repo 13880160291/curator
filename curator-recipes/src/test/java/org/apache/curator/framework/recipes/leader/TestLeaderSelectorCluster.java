@@ -18,10 +18,6 @@
  */
 package org.apache.curator.framework.recipes.leader;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.apache.curator.test.compatibility.CuratorTestBase;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -32,8 +28,8 @@ import org.apache.curator.test.InstanceSpec;
 import org.apache.curator.test.TestingCluster;
 import org.apache.curator.test.Timing;
 import org.apache.curator.utils.ZKPaths;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -62,7 +58,7 @@ public class TestLeaderSelectorCluster extends CuratorTestBase
                 public void takeLeadership(CuratorFramework client) throws Exception
                 {
                     List<String>        names = client.getChildren().forPath("/leader");
-                    assertTrue(names.size() > 0);
+                    Assert.assertTrue(names.size() > 0);
                     semaphore.release();
                 }
 
@@ -74,12 +70,12 @@ public class TestLeaderSelectorCluster extends CuratorTestBase
             LeaderSelector      selector = new LeaderSelector(client, "/leader", listener);
             selector.autoRequeue();
             selector.start();
-            assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
 
             InstanceSpec connectionInstance = cluster.findConnectionInstance(client.getZookeeperClient().getZooKeeper());
             cluster.killServer(connectionInstance);
 
-            assertTrue(timing.multiple(4).acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.multiple(4).acquireSemaphore(semaphore));
         }
         finally
         {
@@ -146,7 +142,7 @@ public class TestLeaderSelectorCluster extends CuratorTestBase
             };
             LeaderSelector      selector = new LeaderSelector(client, "/leader", listener);
             selector.start();
-            assertTrue(timing.multiple(4).acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.multiple(4).acquireSemaphore(semaphore));
             if ( error.get() != null )
             {
                 throw new AssertionError(error.get());
@@ -155,11 +151,11 @@ public class TestLeaderSelectorCluster extends CuratorTestBase
             Collection<InstanceSpec>    instances = cluster.getInstances();
             cluster.stop();
 
-            assertTrue(timing.multiple(4).awaitLatch(lostLatch));
+            Assert.assertTrue(timing.multiple(4).awaitLatch(lostLatch));
             timing.sleepABit();
-            assertFalse(selector.hasLeadership());
+            Assert.assertFalse(selector.hasLeadership());
 
-            assertNotNull(lockNode.get());
+            Assert.assertNotNull(lockNode.get());
             
             cluster = new TestingCluster(instances.toArray(new InstanceSpec[instances.size()]));
             cluster.start();
@@ -173,11 +169,11 @@ public class TestLeaderSelectorCluster extends CuratorTestBase
                 // ignore
             }
 
-            assertTrue(semaphore.availablePermits() == 0);
-            assertFalse(selector.hasLeadership());
+            Assert.assertTrue(semaphore.availablePermits() == 0);
+            Assert.assertFalse(selector.hasLeadership());
 
             selector.requeue();
-            assertTrue(timing.multiple(4).acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.multiple(4).acquireSemaphore(semaphore));
         }
         finally
         {

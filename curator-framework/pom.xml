@@ -24,11 +24,11 @@
     <parent>
         <groupId>org.apache.curator</groupId>
         <artifactId>apache-curator</artifactId>
-        <version>5.1.1-SNAPSHOT</version>
+        <version>5.1.0</version>
     </parent>
 
     <artifactId>curator-framework</artifactId>
-    <version>5.1.1-SNAPSHOT</version>
+    <version>5.1.0</version>
     <packaging>bundle</packaging>
 
     <name>Curator Framework</name>
@@ -40,7 +40,7 @@
             org.apache.zookeeper.*;version="[3.4,4.0)", *
         </osgi.import.package>
         <osgi.export.package>
-            org.apache.curator.framework.*;version="${project.version}";-noimport:=true
+            org.apache.curator.framework*;version="${project.version}";-noimport:=true
         </osgi.export.package>
     </properties>
 
@@ -76,19 +76,14 @@
         </dependency>
 
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

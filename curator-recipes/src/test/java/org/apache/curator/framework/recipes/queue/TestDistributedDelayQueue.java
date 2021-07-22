@@ -18,11 +18,6 @@
  */
 package org.apache.curator.framework.recipes.queue;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.apache.curator.test.BaseClassForTests;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -30,8 +25,10 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.RetryOneTime;
 import org.apache.curator.test.Timing;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -57,14 +54,14 @@ public class TestDistributedDelayQueue extends BaseClassForTests
 
             queue.put(1L, System.currentTimeMillis() + Integer.MAX_VALUE);  // never come out
             Long        value = consumer.take(1, TimeUnit.SECONDS);
-            assertNull(value);
+            Assert.assertNull(value);
 
             queue.put(2L, System.currentTimeMillis());
             value = consumer.take(timing.seconds(), TimeUnit.SECONDS);
-            assertEquals(value, Long.valueOf(2));
+            Assert.assertEquals(value, Long.valueOf(2));
 
             value = consumer.take(1, TimeUnit.SECONDS);
-            assertNull(value);
+            Assert.assertNull(value);
         }
         finally
         {
@@ -88,10 +85,10 @@ public class TestDistributedDelayQueue extends BaseClassForTests
 
             queue.put(1L, System.currentTimeMillis() + 1000);
             Thread.sleep(100);
-            assertEquals(consumer.size(), 0);    // delay hasn't been reached
+            Assert.assertEquals(consumer.size(), 0);    // delay hasn't been reached
 
             Long        value = consumer.take(timing.forWaiting().seconds(), TimeUnit.SECONDS);
-            assertEquals(value, Long.valueOf(1));
+            Assert.assertEquals(value, Long.valueOf(1));
         }
         finally
         {
@@ -126,8 +123,8 @@ public class TestDistributedDelayQueue extends BaseClassForTests
             for ( int i = 0; i < QTY; ++i )
             {
                 Long        value = consumer.take(timing.forWaiting().seconds(), TimeUnit.SECONDS);
-                assertNotNull(value);
-                assertTrue(value >= lastValue);
+                Assert.assertNotNull(value);
+                Assert.assertTrue(value >= lastValue);
                 lastValue = value;
             }
         }
@@ -191,8 +188,8 @@ public class TestDistributedDelayQueue extends BaseClassForTests
             for ( int i = 0; i < QTY; ++i )
             {
                 Long value = consumer.take(DELAY_MS * 2, TimeUnit.MILLISECONDS);
-                assertNotNull(value);
-                assertEquals(value, new Long(lastValue + 1));
+                Assert.assertNotNull(value);
+                Assert.assertEquals(value, new Long(lastValue + 1));
                 lastValue = value;
             }
         }

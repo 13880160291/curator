@@ -19,7 +19,6 @@
 
 package org.apache.curator.framework.imps;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.google.common.collect.Queues;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -28,7 +27,8 @@ import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.RetryOneTime;
 import org.apache.curator.test.Timing;
-import org.junit.jupiter.api.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -58,9 +58,9 @@ public class TestNeverConnected
             client.create().inBackground().forPath("/");
 
             ConnectionState polled = queue.poll(timing.forWaiting().seconds(), TimeUnit.SECONDS);
-            assertEquals(polled, ConnectionState.SUSPENDED);
+            Assert.assertEquals(polled, ConnectionState.SUSPENDED);
             polled = queue.poll(timing.forWaiting().seconds(), TimeUnit.SECONDS);
-            assertEquals(polled, ConnectionState.LOST);
+            Assert.assertEquals(polled, ConnectionState.LOST);
         }
         finally
         {

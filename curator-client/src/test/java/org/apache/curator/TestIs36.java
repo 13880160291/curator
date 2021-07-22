@@ -18,22 +18,19 @@
  */
 package org.apache.curator;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.apache.curator.test.compatibility.CuratorTestBase;
 import org.apache.curator.utils.Compatibility;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class TestIs36 extends CuratorTestBase
 {
-    @Test
-    @Tag(zk36Group)
+    @Test(groups = zk36Group)
     public void testIsZk36()
     {
-        assertTrue(Compatibility.hasGetReachableOrOneMethod());
-        assertTrue(Compatibility.hasAddrField());
-        assertTrue(Compatibility.hasPersistentWatchers());
+        Assert.assertTrue(Compatibility.hasGetReachableOrOneMethod());
+        Assert.assertTrue(Compatibility.hasAddrField());
+        Assert.assertTrue(Compatibility.hasPersistentWatchers());
     }
 
     @Override

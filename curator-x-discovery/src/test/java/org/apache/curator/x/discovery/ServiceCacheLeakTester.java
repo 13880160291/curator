@@ -25,9 +25,9 @@ import org.apache.curator.test.TestingServer;
 import org.apache.curator.test.compatibility.CuratorTestBase;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.curator.x.discovery.strategies.RandomStrategy;
-import org.junit.jupiter.api.Tag;
+import org.testng.annotations.Test;
 
-@Tag(CuratorTestBase.zk35TestCompatibilityGroup)
+@Test(groups = CuratorTestBase.zk35TestCompatibilityGroup)
 public class ServiceCacheLeakTester
 {
     public static void main(String[] args) throws Exception

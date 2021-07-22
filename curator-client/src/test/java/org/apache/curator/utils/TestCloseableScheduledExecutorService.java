@@ -18,17 +18,16 @@
  */
 package org.apache.curator.utils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class TestCloseableScheduledExecutorService
 {
@@ -37,13 +36,13 @@ public class TestCloseableScheduledExecutorService
 
     private volatile ScheduledExecutorService executorService;
 
-    @BeforeEach
+    @BeforeMethod
     public void setup()
     {
         executorService = Executors.newScheduledThreadPool(QTY * 2);
     }
 
-    @AfterEach
+    @AfterMethod
     public void tearDown()
     {
         executorService.shutdownNow();
@@ -69,7 +68,7 @@ public class TestCloseableScheduledExecutorService
                 TimeUnit.MILLISECONDS
         );
 
-        assertTrue(latch.await((QTY * 2) * DELAY_MS, TimeUnit.MILLISECONDS));
+        Assert.assertTrue(latch.await((QTY * 2) * DELAY_MS, TimeUnit.MILLISECONDS));
     }
 
     @Test
@@ -104,18 +103,18 @@ public class TestCloseableScheduledExecutorService
         Thread.sleep(DELAY_MS * 2);
 
         int innerValue = innerCounter.get();
-        assertTrue(innerValue > 0);
+        Assert.assertTrue(innerValue > 0);
 
         int value = outerCounter.get();
         Thread.sleep(DELAY_MS * 2);
         int newValue = outerCounter.get();
-        assertTrue(newValue > value);
-        assertEquals(innerValue, innerCounter.get());
+        Assert.assertTrue(newValue > value);
+        Assert.assertEquals(innerValue, innerCounter.get());
 
         value = newValue;
         Thread.sleep(DELAY_MS * 2);
         newValue = outerCounter.get();
-        assertTrue(newValue > value);
-        assertEquals(innerValue, innerCounter.get());
+        Assert.assertTrue(newValue > value);
+        Assert.assertEquals(innerValue, innerCounter.get());
     }
 }

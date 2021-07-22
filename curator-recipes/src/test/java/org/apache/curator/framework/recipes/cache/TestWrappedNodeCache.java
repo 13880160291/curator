@@ -18,11 +18,6 @@
  */
 package org.apache.curator.framework.recipes.cache;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.imps.TestCleanState;
@@ -30,9 +25,8 @@ import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.RetryOneTime;
 import org.apache.curator.test.compatibility.CuratorTestBase;
 import org.apache.curator.utils.CloseableUtils;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
@@ -40,7 +34,7 @@ import java.util.function.Supplier;
 
 import static org.apache.curator.framework.recipes.cache.CuratorCacheListener.builder;
 
-@Tag(CuratorTestBase.zk36Group)
+@Test(groups = CuratorTestBase.zk36Group)
 public class TestWrappedNodeCache extends CuratorTestBase
 {
     @Test
@@ -61,18 +55,18 @@ public class TestWrappedNodeCache extends CuratorTestBase
             Supplier<Optional<ChildData>> rootData = getRootDataProc(cache, "/test/foo");
 
             cache.start();
-            assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
 
-            assertTrue(rootData.get().isPresent());
-            assertArrayEquals(rootData.get().get().getData(), "one".getBytes());
+            Assert.assertTrue(rootData.get().isPresent());
+            Assert.assertEquals(rootData.get().get().getData(), "one".getBytes());
 
             client.delete().forPath("/test/foo");
-            assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
             client.create().forPath("/test/foo", "two".getBytes());
-            assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
 
-            assertTrue(rootData.get().isPresent());
-            assertArrayEquals(rootData.get().get().getData(), "two".getBytes());
+            Assert.assertTrue(rootData.get().isPresent());
+            Assert.assertEquals(rootData.get().get().getData(), "two".getBytes());
         }
         finally
         {
@@ -109,18 +103,18 @@ public class TestWrappedNodeCache extends CuratorTestBase
             Supplier<Optional<ChildData>> rootData = getRootDataProc(cache, "/test/node");
 
             cache.start();
-            assertTrue(timing.acquireSemaphore(latch));
+            Assert.assertTrue(timing.acquireSemaphore(latch));
 
             client.getZookeeperClient().getZooKeeper().getTestable().injectSessionExpiration();
-            assertTrue(timing.awaitLatch(lostLatch));
+            Assert.assertTrue(timing.awaitLatch(lostLatch));
 
-            assertTrue(rootData.get().isPresent());
-            assertArrayEquals(rootData.get().get().getData(), "start".getBytes());
+            Assert.assertTrue(rootData.get().isPresent());
+            Assert.assertEquals(rootData.get().get().getData(), "start".getBytes());
 
             client.setData().forPath("/test/node", "new data".getBytes());
-            assertTrue(timing.acquireSemaphore(latch));
-            assertTrue(rootData.get().isPresent());
-            assertArrayEquals(rootData.get().get().getData(), "new data".getBytes());
+            Assert.assertTrue(timing.acquireSemaphore(latch));
+            Assert.assertTrue(rootData.get().isPresent());
+            Assert.assertEquals(rootData.get().get().getData(), "new data".getBytes());
         }
         finally
         {
@@ -149,19 +143,19 @@ public class TestWrappedNodeCache extends CuratorTestBase
             NodeCacheListener listener = semaphore::release;
             cache.listenable().addListener(builder().forNodeCache(listener).build());
 
-            assertNull(rootData.get().orElse(null));
+            Assert.assertNull(rootData.get().orElse(null));
 
             client.create().forPath("/test/node", "a".getBytes());
-            assertTrue(timing.acquireSemaphore(semaphore));
-            assertArrayEquals(rootData.get().orElse(null).getData(), "a".getBytes());
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertEquals(rootData.get().orElse(null).getData(), "a".getBytes());
 
             client.setData().forPath("/test/node", "b".getBytes());
-            assertTrue(timing.acquireSemaphore(semaphore));
-            assertArrayEquals(rootData.get().orElse(null).getData(), "b".getBytes());
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertEquals(rootData.get().orElse(null).getData(), "b".getBytes());
 
             client.delete().forPath("/test/node");
-            assertTrue(timing.acquireSemaphore(semaphore));
-            assertNull(rootData.get().orElse(null));
+            Assert.assertTrue(timing.acquireSemaphore(semaphore));
+            Assert.assertNull(rootData.get().orElse(null));
         }
         finally
         {

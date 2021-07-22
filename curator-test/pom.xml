@@ -24,11 +24,11 @@
     <parent>
         <groupId>org.apache.curator</groupId>
         <artifactId>apache-curator</artifactId>
-        <version>5.1.1-SNAPSHOT</version>
+        <version>5.1.0</version>
     </parent>
 
     <artifactId>curator-test</artifactId>
-    <version>5.1.1-SNAPSHOT</version>
+    <version>5.1.0</version>
 
     <name>Curator Testing</name>
     <description>Unit testing utilities.</description>
@@ -56,11 +56,12 @@
         </dependency>
 
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>provided</scope>
         </dependency>
 
-        <dependency>
+	    <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <scope>test</scope>
@@ -105,16 +106,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <threadCount>1</threadCount>
-                    <reuseForks>false</reuseForks>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                </configuration>
             </plugin>
         </plugins>
     </build>

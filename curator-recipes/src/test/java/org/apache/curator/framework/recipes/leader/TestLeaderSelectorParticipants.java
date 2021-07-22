@@ -18,9 +18,6 @@
  */
 package org.apache.curator.framework.recipes.leader;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.curator.test.BaseClassForTests;
@@ -29,8 +26,8 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.RetryOneTime;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -67,16 +64,16 @@ public class TestLeaderSelectorParticipants extends BaseClassForTests
             selector.setId("A is A");
             selector.start();
 
-            assertTrue(latch.await(10, TimeUnit.SECONDS));
+            Assert.assertTrue(latch.await(10, TimeUnit.SECONDS));
 
             Participant leader = selector.getLeader();
-            assertTrue(leader.isLeader());
-            assertEquals(leader.getId(), "A is A");
+            Assert.assertTrue(leader.isLeader());
+            Assert.assertEquals(leader.getId(), "A is A");
 
             Collection<Participant>     participants = selector.getParticipants();
-            assertEquals(participants.size(), 1);
-            assertEquals(participants.iterator().next().getId(), "A is A");
-            assertEquals(participants.iterator().next().getId(), selector.getId());
+            Assert.assertEquals(participants.size(), 1);
+            Assert.assertEquals(participants.iterator().next().getId(), "A is A");
+            Assert.assertEquals(participants.iterator().next().getId(), selector.getId());
         }
         finally
         {
@@ -133,15 +130,15 @@ public class TestLeaderSelectorParticipants extends BaseClassForTests
                 selector.start();
             }
 
-            assertTrue(leaderLatch.await(10, TimeUnit.SECONDS));
-            assertTrue(workingLatch.await(10, TimeUnit.SECONDS));
+            Assert.assertTrue(leaderLatch.await(10, TimeUnit.SECONDS));
+            Assert.assertTrue(workingLatch.await(10, TimeUnit.SECONDS));
             
             Thread.sleep(1000); // some time for locks to acquire
 
             Collection<Participant>     participants = selectors.get(0).getParticipants();
             for ( int i = 1; i < selectors.size(); ++i )
             {
-                assertEquals(participants, selectors.get(i).getParticipants());
+                Assert.assertEquals(participants, selectors.get(i).getParticipants());
             }
 
             Set<String>                 ids = Sets.newHashSet();
@@ -152,17 +149,17 @@ public class TestLeaderSelectorParticipants extends BaseClassForTests
                 {
                     ++leaderCount;
                 }
-                assertFalse(ids.contains(participant.getId()));
+                Assert.assertFalse(ids.contains(participant.getId()));
                 ids.add(participant.getId());
             }
-            assertEquals(leaderCount, 1);
+            Assert.assertEquals(leaderCount, 1);
 
             Set<String>                 expectedIds = Sets.newHashSet();
             for ( int i = 0; i < SELECTOR_QTY; ++i )
             {
                 expectedIds.add(Integer.toString(i));
             }
-            assertEquals(expectedIds, ids);
+            Assert.assertEquals(expectedIds, ids);
         }
         finally
         {

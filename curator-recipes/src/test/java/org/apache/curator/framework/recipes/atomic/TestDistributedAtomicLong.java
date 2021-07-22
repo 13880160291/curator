@@ -18,12 +18,6 @@
  */
 package org.apache.curator.framework.recipes.atomic;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
-import com.google.common.collect.Lists;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -33,8 +27,9 @@ import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math.stat.descriptive.SynchronizedSummaryStatistics;
 import org.apache.curator.test.BaseClassForTests;
 import org.apache.curator.utils.CloseableUtils;
-import org.junit.jupiter.api.Test;
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import org.testng.collections.Lists;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.util.List;
@@ -63,11 +58,11 @@ public class TestDistributedAtomicLong extends BaseClassForTests
             }
             catch ( BufferUnderflowException e )
             {
-                fail("", e);
+                Assert.fail("", e);
             }
             catch ( BufferOverflowException e )
             {
-                fail("", e);
+                Assert.fail("", e);
             }
             catch ( RuntimeException e )
             {
@@ -89,13 +84,13 @@ public class TestDistributedAtomicLong extends BaseClassForTests
             client.start();
             DistributedAtomicLong dal = new DistributedAtomicLong(client, "/counter", new RetryOneTime(1));
             AtomicValue<Long> result = dal.compareAndSet(0L, 1L);
-            assertFalse(result.succeeded());
+            Assert.assertFalse(result.succeeded());
 
-            assertTrue(dal.initialize(0L));
+            Assert.assertTrue(dal.initialize(0L));
             result = dal.compareAndSet(0L, 1L);
-            assertTrue(result.succeeded());
+            Assert.assertTrue(result.succeeded());
 
-            assertFalse(dal.initialize(0L));
+            Assert.assertFalse(dal.initialize(0L));
         }
         finally
         {
@@ -135,11 +130,11 @@ public class TestDistributedAtomicLong extends BaseClassForTests
             };
             dal.forceSet(1L);
 
-            assertTrue(dal.compareAndSet(1L, 5L).succeeded());
-            assertFalse(dal.compareAndSet(1L, 5L).succeeded());
+            Assert.assertTrue(dal.compareAndSet(1L, 5L).succeeded());
+            Assert.assertFalse(dal.compareAndSet(1L, 5L).succeeded());
 
             doIncrement.set(true);
-            assertFalse(dal.compareAndSet(5L, 10L).succeeded());
+            Assert.assertFalse(dal.compareAndSet(5L, 10L).succeeded());
         }
         finally
         {
@@ -190,7 +185,7 @@ public class TestDistributedAtomicLong extends BaseClassForTests
                 }
             );
 
-            assertTrue(dal.get().preValue() < 10);
+            Assert.assertTrue(dal.get().preValue() < 10);
         }
         finally
         {
@@ -242,9 +237,9 @@ public class TestDistributedAtomicLong extends BaseClassForTests
         System.out.println("Min time: " + timingStats.getMin());
         System.out.println("Qty: " + timingStats.getN());
 
-        assertEquals(errors.get(), 0);
-        assertTrue(optimisticTries.get() > 0);
-        assertTrue(promotedLockTries.get() > 0);
+        Assert.assertEquals(errors.get(), 0);
+        Assert.assertTrue(optimisticTries.get() > 0);
+        Assert.assertTrue(promotedLockTries.get() > 0);
     }
 
     @Test
@@ -257,32 +252,32 @@ public class TestDistributedAtomicLong extends BaseClassForTests
             DistributedAtomicLong dal = new DistributedAtomicLong(client, "/foo/bar/counter", new RetryOneTime(1));
 
             AtomicValue<Long>           value = dal.increment();
-            assertTrue(value.succeeded());
-            assertEquals(value.getStats().getOptimisticTries(), 1);
-            assertEquals(value.getStats().getPromotedLockTries(), 0);
-            assertEquals(value.preValue().longValue(), 0L);
-            assertEquals(value.postValue().longValue(), 1L);
+            Assert.assertTrue(value.succeeded());
+            Assert.assertEquals(value.getStats().getOptimisticTries(), 1);
+            Assert.assertEquals(value.getStats().getPromotedLockTries(), 0);
+            Assert.assertEquals(value.preValue().longValue(), 0L);
+            Assert.assertEquals(value.postValue().longValue(), 1L);
 
             value = dal.decrement();
-            assertTrue(value.succeeded());
-            assertEquals(value.getStats().getOptimisticTries(), 1);
-            assertEquals(value.getStats().getPromotedLockTries(), 0);
-            assertEquals(value.preValue().longValue(), 1L);
-            assertEquals(value.postValue().longValue(), 0L);
+            Assert.assertTrue(value.succeeded());
+            Assert.assertEquals(value.getStats().getOptimisticTries(), 1);
+            Assert.assertEquals(value.getStats().getPromotedLockTries(), 0);
+            Assert.assertEquals(value.preValue().longValue(), 1L);
+            Assert.assertEquals(value.postValue().longValue(), 0L);
 
             value = dal.add(10L);
-            assertTrue(value.succeeded());
-            assertEquals(value.getStats().getOptimisticTries(), 1);
-            assertEquals(value.getStats().getPromotedLockTries(), 0);
-            assertEquals(value.preValue().longValue(), 0L);
-            assertEquals(value.postValue().longValue(), 10L);
+            Assert.assertTrue(value.succeeded());
+            Assert.assertEquals(value.getStats().getOptimisticTries(), 1);
+            Assert.assertEquals(value.getStats().getPromotedLockTries(), 0);
+            Assert.assertEquals(value.preValue().longValue(), 0L);
+            Assert.assertEquals(value.postValue().longValue(), 10L);
 
             value = dal.subtract(5L);
-            assertTrue(value.succeeded());
-            assertEquals(value.getStats().getOptimisticTries(), 1);
-            assertEquals(value.getStats().getPromotedLockTries(), 0);
-            assertEquals(value.preValue().longValue(), 10L);
-            assertEquals(value.postValue().longValue(), 5L);
+            Assert.assertTrue(value.succeeded());
+            Assert.assertEquals(value.getStats().getOptimisticTries(), 1);
+            Assert.assertEquals(value.getStats().getPromotedLockTries(), 0);
+            Assert.assertEquals(value.preValue().longValue(), 10L);
+            Assert.assertEquals(value.postValue().longValue(), 5L);
         }
         finally
         {
